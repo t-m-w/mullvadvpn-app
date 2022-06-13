@@ -138,17 +138,18 @@ impl TunnelMonitor {
             #[cfg(target_os = "android")]
             TunnelParameters::OpenVpn(_) => Err(Error::UnsupportedPlatform),
 
-            TunnelParameters::Wireguard(ref mut config) => Self::start_wireguard_tunnel(
-                runtime,
-                config,
-                log_file,
-                resource_dir,
-                on_event,
-                tun_provider,
-                route_manager,
-                retry_attempt,
-                tunnel_close_rx,
-            ),
+            TunnelParameters::Wireguard(ref mut config) => {
+                runtime.block_on(Self::start_wireguard_tunnel(
+                    config,
+                    log_file,
+                    resource_dir,
+                    on_event,
+                    tun_provider,
+                    route_manager,
+                    retry_attempt,
+                    tunnel_close_rx,
+                ))
+            }
         }
     }
 
@@ -174,8 +175,7 @@ impl TunnelMonitor {
         resource_dir.join(process_string)
     }
 
-    fn start_wireguard_tunnel<L>(
-        runtime: tokio::runtime::Handle,
+    async fn start_wireguard_tunnel<L>(
         params: &mut wireguard_types::TunnelParameters,
         log: Option<PathBuf>,
         resource_dir: &Path,
@@ -193,10 +193,9 @@ impl TunnelMonitor {
             + 'static,
     {
         #[cfg(target_os = "linux")]
-        runtime.block_on(Self::assign_mtu(&route_manager, params));
+        Self::assign_mtu(&route_manager, params).await;
         let config = wireguard::config::Config::from_parameters(params)?;
         let monitor = wireguard::WireguardMonitor::start(
-            runtime,
             config,
             if params.options.use_pq_safe_psk {
                 Some(
@@ -217,7 +216,8 @@ impl TunnelMonitor {
             route_manager,
             retry_attempt,
             tunnel_close_rx,
-        )?;
+        )
+        .await?;
         Ok(TunnelMonitor {
             monitor: InternalTunnelMonitor::Wireguard(monitor),
         })

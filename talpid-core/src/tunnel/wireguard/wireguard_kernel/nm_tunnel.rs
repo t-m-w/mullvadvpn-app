@@ -30,10 +30,7 @@ pub struct NetworkManagerTunnel {
 }
 
 impl NetworkManagerTunnel {
-    pub fn new(
-        tokio_handle: tokio::runtime::Handle,
-        config: &Config,
-    ) -> std::result::Result<Self, WgKernelError> {
+    pub async fn new(config: &Config) -> std::result::Result<Self, WgKernelError> {
         let network_manager = NetworkManager::new()
             .map_err(Error::NetworkManager)
             .map_err(WgKernelError::NetworkManager)?;
@@ -49,13 +46,13 @@ impl NetworkManagerTunnel {
                 MULLVAD_INTERFACE_NAME.to_string()
             }
         };
-        let netlink_connections = tokio_handle.block_on(Handle::connect())?;
+        let netlink_connections = Handle::connect().await?;
 
         Ok(NetworkManagerTunnel {
             network_manager,
             tunnel: Some(tunnel),
             netlink_connections,
-            tokio_handle,
+            tokio_handle: tokio::runtime::Handle::current(),
             interface_name,
         })
     }

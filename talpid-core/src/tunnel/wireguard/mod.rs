@@ -145,8 +145,7 @@ lazy_static! {
         .unwrap_or(false);
 }
 
-fn maybe_create_obfuscator(
-    runtime: &tokio::runtime::Handle,
+async fn maybe_create_obfuscator(
     config: &mut Config,
     close_msg_sender: sync_mpsc::Sender<CloseMsg>,
 ) -> Result<Option<ObfuscatorHandle>> {
@@ -163,8 +162,8 @@ fn maybe_create_obfuscator(
                     #[cfg(target_os = "linux")]
                     fwmark: Some(crate::linux::TUNNEL_FW_MARK),
                 };
-                let obfuscator = runtime
-                    .block_on(create_obfuscator(&ObfuscationSettings::Udp2Tcp(settings)))
+                let obfuscator = create_obfuscator(&ObfuscationSettings::Udp2Tcp(settings))
+                    .await
                     .map_err(Error::CreateObfuscatorError)?;
                 let endpoint = obfuscator.endpoint();
                 log::trace!("Patching first WireGuard peer to become {:?}", endpoint);
@@ -184,7 +183,7 @@ fn maybe_create_obfuscator(
                         }
                     }
                 });
-                runtime.spawn(runner);
+                tokio::spawn(runner);
                 return Ok(Some(ObfuscatorHandle::new(abort_handle)));
             }
         }
@@ -201,7 +200,6 @@ impl WireguardMonitor {
             + Clone
             + 'static,
     >(
-        runtime: tokio::runtime::Handle,
         mut config: Config,
         psk_negotiation: Option<PublicKey>,
         log_path: Option<&Path>,
@@ -216,26 +214,26 @@ impl WireguardMonitor {
             config.peers.iter().map(|peer| peer.endpoint.ip()).collect();
         let (close_msg_sender, close_msg_receiver) = sync_mpsc::channel();
 
-        let obfuscator = maybe_create_obfuscator(&runtime, &mut config, close_msg_sender.clone())?;
+        let obfuscator = maybe_create_obfuscator(&mut config, close_msg_sender.clone()).await?;
 
         #[cfg(target_os = "windows")]
         let (setup_done_tx, mut setup_done_rx) = mpsc::channel(0);
 
         let tunnel = Self::open_tunnel(
-            runtime.clone(),
             &Self::patch_allowed_ips(&config, psk_negotiation.is_some()),
             log_path,
             resource_dir,
             tun_provider,
             #[cfg(target_os = "windows")]
             setup_done_tx,
-        )?;
+        )
+        .await?;
         let iface_name = tunnel.get_interface_name().to_string();
 
         let event_callback = Box::new(on_event.clone());
         let (pinger_tx, pinger_rx) = sync_mpsc::channel();
         let monitor = WireguardMonitor {
-            runtime: runtime.clone(),
+            runtime: tokio::runtime::Handle::current(),
             tunnel: Arc::new(Mutex::new(Some(tunnel))),
             event_callback,
             close_msg_receiver,
@@ -469,8 +467,7 @@ impl WireguardMonitor {
     }
 
     #[allow(unused_variables)]
-    fn open_tunnel(
-        runtime: tokio::runtime::Handle,
+    async fn open_tunnel(
         config: &Config,
         log_path: Option<&Path>,
         resource_dir: &Path,
@@ -480,7 +477,7 @@ impl WireguardMonitor {
         #[cfg(target_os = "linux")]
         if !*FORCE_USERSPACE_WIREGUARD {
             if crate::dns::will_use_nm() {
-                match wireguard_kernel::NetworkManagerTunnel::new(runtime, config) {
+                match wireguard_kernel::NetworkManagerTunnel::new(config).await {
                     Ok(tunnel) => {
                         log::debug!("Using NetworkManager to use kernel WireGuard implementation");
                         return Ok(Box::new(tunnel));
@@ -495,7 +492,7 @@ impl WireguardMonitor {
                     }
                 };
             } else {
-                match wireguard_kernel::NetlinkTunnel::new(runtime, config) {
+                match wireguard_kernel::NetlinkTunnel::new(config).await {
                     Ok(tunnel) => {
                         log::debug!("Using kernel WireGuard implementation");
                         return Ok(Box::new(tunnel));

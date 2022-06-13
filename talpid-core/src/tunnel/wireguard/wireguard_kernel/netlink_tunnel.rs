@@ -15,35 +15,33 @@ pub struct NetlinkTunnel {
 }
 
 impl NetlinkTunnel {
-    pub fn new(tokio_handle: tokio::runtime::Handle, config: &Config) -> Result<Self, Error> {
-        tokio_handle.clone().block_on(async {
-            let mut netlink_connections = Handle::connect().await?;
-            let interface_index = netlink_connections
-                .create_device(MULLVAD_INTERFACE_NAME.to_string(), config.mtu as u32)
-                .await?;
+    pub async fn new(config: &Config) -> Result<Self, Error> {
+        let mut netlink_connections = Handle::connect().await?;
+        let interface_index = netlink_connections
+            .create_device(MULLVAD_INTERFACE_NAME.to_string(), config.mtu as u32)
+            .await?;
 
-            let mut tunnel = Self {
-                interface_index,
-                netlink_connections,
-                tokio_handle,
-            };
+        let mut tunnel = Self {
+            interface_index,
+            netlink_connections,
+            tokio_handle: tokio::runtime::Handle::current(),
+        };
 
-            if let Err(err) = tunnel.setup(config).await {
-                if let Err(teardown_err) = tunnel
-                    .netlink_connections
-                    .delete_device(interface_index)
-                    .await
-                {
-                    log::error!(
-                        "Failed to tear down WireGuard interface after failing to apply config: {}",
-                        teardown_err
-                    );
-                }
-                return Err(err);
+        if let Err(err) = tunnel.setup(config).await {
+            if let Err(teardown_err) = tunnel
+                .netlink_connections
+                .delete_device(interface_index)
+                .await
+            {
+                log::error!(
+                    "Failed to tear down WireGuard interface after failing to apply config: {}",
+                    teardown_err
+                );
             }
+            return Err(err);
+        }
 
-            Ok(tunnel)
-        })
+        Ok(tunnel)
     }
 
     async fn setup(&mut self, config: &Config) -> Result<(), Error> {

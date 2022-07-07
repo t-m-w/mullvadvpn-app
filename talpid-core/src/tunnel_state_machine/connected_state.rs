@@ -87,19 +87,21 @@ impl ConnectedState {
         if let Some(ref servers) = shared_values.dns_servers {
             servers.clone()
         } else {
-            let mut dns_ips = vec![self.metadata.ipv4_gateway.into()];
+            let mut dns_ips: Vec<IpAddr> = vec![self.metadata.ipv4_gateway.into()];
             if let Some(ipv6_gateway) = self.metadata.ipv6_gateway {
                 dns_ips.push(ipv6_gateway.into());
             };
+            dns_ips.sort_by_key(|ip| ip.is_ipv4());
             dns_ips
         }
         #[cfg(target_os = "android")]
         {
-            let mut dns_ips = vec![];
+            let mut dns_ips: Vec<IpAddr> = vec![];
             dns_ips.push(self.metadata.ipv4_gateway.into());
             if let Some(ipv6_gateway) = self.metadata.ipv6_gateway {
                 dns_ips.push(ipv6_gateway.into());
             };
+            dns_ips.sort_by_key(|ip| ip.is_ipv4());
             dns_ips
         }
     }
@@ -120,10 +122,11 @@ impl ConnectedState {
     }
 
     fn set_dns(&self, shared_values: &mut SharedTunnelStateValues) -> Result<(), BoxedError> {
+        #[cfg(not(any(target_os = "linux", target_os = "windows")))]
         let dns_ips = self.get_dns_servers(shared_values);
 
         #[cfg(any(target_os = "linux", target_os = "windows"))]
-        let dns_ips = dns_ips
+        let dns_ips = self.get_dns_servers(shared_values)
             .into_iter()
             .filter(|ip| {
                 !crate::firewall::is_local_address(ip)

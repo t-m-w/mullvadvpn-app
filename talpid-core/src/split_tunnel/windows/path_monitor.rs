@@ -544,7 +544,7 @@ impl PathMonitor {
         original_paths: &mut Vec<PathBuf>,
         cmd_rx: &sync_mpsc::Receiver<PathMonitorCommand>,
     ) -> bool {
-        while let Some(cmd) = cmd_rx.try_iter().next() {
+        if let Some(cmd) = cmd_rx.try_iter().next() {
             match cmd {
                 PathMonitorCommand::Shutdown => {
                     return false;

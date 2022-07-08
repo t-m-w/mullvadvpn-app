@@ -3,10 +3,10 @@ use std::{ffi::CStr, io, ptr};
 use winapi::um::{stringapiset::MultiByteToWideChar, winnls::CP_ACP};
 
 /// Logging callback type.
-pub type LogSink = extern "system" fn(level: log::Level, msg: *const c_char, context: *mut c_void);
+pub type LogSink = unsafe extern "system" fn(level: log::Level, msg: *const c_char, context: *mut c_void);
 
 /// Logging callback implementation.
-pub extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: *mut c_void) {
+pub unsafe extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: *mut c_void) {
     if msg.is_null() {
         log::error!("Log message from FFI boundary is NULL");
     } else {
@@ -14,10 +14,10 @@ pub extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: 
         let target = if context.is_null() {
             "UNKNOWN".into()
         } else {
-            unsafe { CStr::from_ptr(context as *const _).to_string_lossy() }
+            CStr::from_ptr(context as *const _).to_string_lossy()
         };
 
-        let mb_string = unsafe { CStr::from_ptr(msg) };
+        let mb_string = CStr::from_ptr(msg);
 
         let managed_msg = match multibyte_to_wide(mb_string, CP_ACP) {
             Ok(wide_str) => String::from_utf16_lossy(&wide_str),

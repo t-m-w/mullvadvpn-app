@@ -107,9 +107,10 @@ pub struct WireguardMonitor {
     _obfuscator: Option<ObfuscatorHandle>,
 }
 
-const INITIAL_PSK_EXCHANGE_TIMEOUT: Duration = Duration::from_secs(4);
-const MAX_PSK_EXCHANGE_TIMEOUT: Duration = Duration::from_secs(15);
-const PSK_EXCHANGE_TIMEOUT_MULTIPLIER: u32 = 2;
+const INITIAL_CONFIG_SERVICE_TIMEOUT: Duration = Duration::from_secs(4);
+const MAX_CONFIG_SERVICE_TIMEOUT: Duration = Duration::from_secs(15);
+const CONFIG_SERVICE_TIMEOUT_MULTIPLIER: u32 = 2;
+const PSK_EXCHANGE_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// Simple wrapper that automatically cancels the future which runs an obfuscator.
 struct ObfuscatorHandle {
@@ -418,22 +419,31 @@ impl WireguardMonitor {
     ) -> std::result::Result<(), CloseMsg> {
         log::debug!("Performing PQ-safe PSK exchange");
 
-        let timeout = std::cmp::min(
-            MAX_PSK_EXCHANGE_TIMEOUT,
-            INITIAL_PSK_EXCHANGE_TIMEOUT
-                .saturating_mul(PSK_EXCHANGE_TIMEOUT_MULTIPLIER.saturating_pow(retry_attempt)),
+        let connect_timeout = std::cmp::min(
+            MAX_CONFIG_SERVICE_TIMEOUT,
+            INITIAL_CONFIG_SERVICE_TIMEOUT
+                .saturating_mul(CONFIG_SERVICE_TIMEOUT_MULTIPLIER.saturating_pow(retry_attempt)),
         );
 
-        let (private_key, psk) = tokio::time::timeout(
-            timeout,
-            talpid_tunnel_config_client::push_pq_key(
-                IpAddr::V4(config.ipv4_gateway),
-                config.tunnel.private_key.public_key(),
-            ),
+        let mut client = tokio::time::timeout(
+            connect_timeout,
+            talpid_tunnel_config_client::Client::connect(IpAddr::V4(config.ipv4_gateway)),
         )
         .await
         .map_err(|_timeout_err| {
-            log::warn!("Timeout while negotiating PSK");
+            log::warn!("Connecting to tunnel config service timed out");
+            CloseMsg::PskNegotiationTimeout
+        })?
+        .map_err(Error::PskNegotiationError)
+        .map_err(CloseMsg::SetupError)?;
+
+        let (private_key, psk) = tokio::time::timeout(
+            PSK_EXCHANGE_TIMEOUT,
+            client.push_pq_key(config.tunnel.private_key.public_key()),
+        )
+        .await
+        .map_err(|_timeout_err| {
+            log::warn!("PSK handshake timed out");
             CloseMsg::PskNegotiationTimeout
         })?
         .map_err(Error::PskNegotiationError)

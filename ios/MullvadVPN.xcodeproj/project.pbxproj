@@ -309,6 +309,8 @@
 		58FEEB58260B662E00A621A8 /* AutomaticKeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FEEB57260B662E00A621A8 /* AutomaticKeyboardResponder.swift */; };
 		58FF2C03281BDE02009EF542 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF2C02281BDE02009EF542 /* SettingsManager.swift */; };
 		E158B360285381C60002F069 /* StringFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E158B35F285381C60002F069 /* StringFormatter.swift */; };
+		E19CCCEF288EEDDF00309FC7 /* OutOfTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19CCCEE288EEDDF00309FC7 /* OutOfTimeViewController.swift */; };
+		E19CCCF12890005800309FC7 /* OutOfTimeContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19CCCF02890005800309FC7 /* OutOfTimeContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -597,6 +599,8 @@
 		58FEEB57260B662E00A621A8 /* AutomaticKeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticKeyboardResponder.swift; sourceTree = "<group>"; };
 		58FF2C02281BDE02009EF542 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		E158B35F285381C60002F069 /* StringFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringFormatter.swift; sourceTree = "<group>"; };
+		E19CCCEE288EEDDF00309FC7 /* OutOfTimeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutOfTimeViewController.swift; sourceTree = "<group>"; };
+		E19CCCF02890005800309FC7 /* OutOfTimeContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutOfTimeContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -920,6 +924,8 @@
 				587D9675288989DB00CD8F1C /* NSLayoutConstraint+Helpers.swift */,
 				5871FB9F254C26BF0051A0A4 /* NSRegularExpression+IPAddress.swift */,
 				58CC40EE24A601900019D96E /* ObserverList.swift */,
+				E19CCCEE288EEDDF00309FC7 /* OutOfTimeViewController.swift */,
+				E19CCCF02890005800309FC7 /* OutOfTimeContentView.swift */,
 				580EE1FF24B3218800F9D8A1 /* Operations */,
 				584D26C3270C855A004EA533 /* PreferencesDataSource.swift */,
 				587EB6732714520600123C75 /* PreferencesDataSourceDelegate.swift */,
@@ -1341,6 +1347,7 @@
 				585DA88426B0270700B8C587 /* ServerRelaysResponse.swift in Sources */,
 				58DF5B742851FF3F00E92647 /* InputOperation.swift in Sources */,
 				58F8AC0E25D3F8CE002BE0ED /* ProblemReportReviewViewController.swift in Sources */,
+				E19CCCEF288EEDDF00309FC7 /* OutOfTimeViewController.swift in Sources */,
 				58CCA010224249A1004F3011 /* ConnectViewController.swift in Sources */,
 				5893716A28817A45004EE76C /* DeviceManagementViewController.swift in Sources */,
 				58059DE02846823E002B1049 /* ResultOperation+Output.swift in Sources */,
@@ -1375,6 +1382,7 @@
 				5856D13727450A8A00DFD627 /* UIImage+TintColor.swift in Sources */,
 				58CB0EE024B86751001EF0D8 /* RESTAPIProxy.swift in Sources */,
 				58095C532760EEC700890776 /* RESTNetworkOperation.swift in Sources */,
+				E19CCCF12890005800309FC7 /* OutOfTimeContentView.swift in Sources */,
 				58293FB125124117005D0BB5 /* CustomTextField.swift in Sources */,
 				582AE3102440A6CA00E6733A /* AccountTokenInput.swift in Sources */,
 				58554F7D280D6FE000013055 /* RESTURLSession.swift in Sources */,

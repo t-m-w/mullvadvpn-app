@@ -446,7 +446,7 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
 
 }
 
-private extension REST.CreateApplePaymentResponse {
+extension REST.CreateApplePaymentResponse {
 
     enum Context {
         case purchase

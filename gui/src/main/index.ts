@@ -24,22 +24,18 @@ import BridgeSettingsBuilder from '../shared/bridge-settings-builder';
 import { connectEnabled, disconnectEnabled, reconnectEnabled } from '../shared/connect-helper';
 import {
   AccountToken,
-  BridgeSettings,
   BridgeState,
   DaemonEvent,
   DeviceEvent,
   DeviceState,
   IAccountData,
   IAppVersionInfo,
-  IDeviceRemoval,
-  IDnsOptions,
   IRelayList,
   ISettings,
   liftConstraint,
   ObfuscationType,
   Ownership,
   RelaySettings,
-  RelaySettingsUpdate,
   TunnelState,
 } from '../shared/daemon-rpc-types';
 import { messages, relayLocations } from '../shared/gettext';
@@ -94,9 +90,6 @@ const execAsync = util.promisify(exec);
 const linuxSplitTunneling = process.platform === 'linux' && require('./linux-split-tunneling');
 const windowsSplitTunneling = process.platform === 'win32' && require('./windows-split-tunneling');
 
-const DAEMON_RPC_PATH =
-  process.platform === 'win32' ? 'unix:////./pipe/Mullvad VPN' : 'unix:///var/run/mullvad-vpn';
-
 const GUI_VERSION = app.getVersion().replace('.0', '');
 /// Mirrors the beta check regex in the daemon. Matches only well formed beta versions
 const IS_BETA = /^(\d{4})\.(\d+)-beta(\d+)$/;
@@ -134,7 +127,7 @@ class ApplicationMain {
   // hidden when losing focus.
   private browsingFiles = false;
 
-  private daemonRpc = new DaemonRpc(DAEMON_RPC_PATH);
+  private daemonRpc = DaemonRpc.getInstance();
   private daemonEventListener?: SubscriptionListener<DaemonEvent>;
   private reconnectBackoff = new ReconnectionBackoff();
   private beforeFirstDaemonConnection = true;
@@ -1309,46 +1302,18 @@ class ApplicationMain {
       scrollPositions: this.scrollPositions,
     }));
 
-    IpcMainEventChannel.settings.handleSetAllowLan((allowLan: boolean) =>
-      this.daemonRpc.setAllowLan(allowLan),
-    );
-    IpcMainEventChannel.settings.handleSetShowBetaReleases((showBetaReleases: boolean) =>
-      this.daemonRpc.setShowBetaReleases(showBetaReleases),
-    );
-    IpcMainEventChannel.settings.handleSetEnableIpv6((enableIpv6: boolean) =>
-      this.daemonRpc.setEnableIpv6(enableIpv6),
-    );
-    IpcMainEventChannel.settings.handleSetBlockWhenDisconnected((blockWhenDisconnected: boolean) =>
-      this.daemonRpc.setBlockWhenDisconnected(blockWhenDisconnected),
-    );
     IpcMainEventChannel.settings.handleSetBridgeState(async (bridgeState: BridgeState) => {
       await this.daemonRpc.setBridgeState(bridgeState);
 
       // Reset bridge constraints to `any` when the state is set to auto or off
       if (bridgeState === 'auto' || bridgeState === 'off') {
-        await this.daemonRpc.setBridgeSettings(new BridgeSettingsBuilder().location.any().build());
+        await this.daemonRpc.updateBridgeSettings(
+          new BridgeSettingsBuilder().location.any().build(),
+        );
       }
-    });
-    IpcMainEventChannel.settings.handleSetOpenVpnMssfix((mssfix?: number) =>
-      this.daemonRpc.setOpenVpnMssfix(mssfix),
-    );
-    IpcMainEventChannel.settings.handleSetWireguardMtu((mtu?: number) =>
-      this.daemonRpc.setWireguardMtu(mtu),
-    );
-    IpcMainEventChannel.settings.handleUpdateRelaySettings((update: RelaySettingsUpdate) =>
-      this.daemonRpc.updateRelaySettings(update),
-    );
-    IpcMainEventChannel.settings.handleUpdateBridgeSettings((bridgeSettings: BridgeSettings) => {
-      return this.daemonRpc.setBridgeSettings(bridgeSettings);
-    });
-    IpcMainEventChannel.settings.handleSetDnsOptions((dns: IDnsOptions) => {
-      return this.daemonRpc.setDnsOptions(dns);
     });
     IpcMainEventChannel.autoStart.handleSet((autoStart: boolean) => {
       return this.setAutoStart(autoStart);
-    });
-    IpcMainEventChannel.settings.handleSetObfuscationSettings((obfuscationSettings) => {
-      return this.daemonRpc.setObfuscationSettings(obfuscationSettings);
     });
 
     IpcMainEventChannel.location.handleGet(() => this.daemonRpc.getLocation());
@@ -1407,12 +1372,6 @@ class ApplicationMain {
         log.warn(`Failed to update device info: ${error.message}`);
       }
       return this.daemonRpc.getDevice();
-    });
-    IpcMainEventChannel.account.handleListDevices((accountToken: AccountToken) => {
-      return this.daemonRpc.listDevices(accountToken);
-    });
-    IpcMainEventChannel.account.handleRemoveDevice((deviceRemoval: IDeviceRemoval) => {
-      return this.daemonRpc.removeDevice(deviceRemoval);
     });
 
     IpcMainEventChannel.accountHistory.handleClear(async () => {

@@ -67,6 +67,9 @@ import {
 import { ManagementServiceClient } from './management_interface/management_interface_grpc_pb';
 import * as grpcTypes from './management_interface/management_interface_pb';
 
+const DAEMON_RPC_PATH =
+  process.platform === 'win32' ? 'unix:////./pipe/Mullvad VPN' : 'unix:///var/run/mullvad-vpn';
+
 const NETWORK_CALL_TIMEOUT = 10000;
 const CHANNEL_STATE_TIMEOUT = 1000 * 60 * 60;
 
@@ -126,6 +129,8 @@ type CallFunctionArgument<T, R> =
   | undefined;
 
 export class DaemonRpc {
+  private static instance: DaemonRpc;
+
   private client: ManagementServiceClient;
   private isConnected = false;
   private connectionObservers: ConnectionObserver[] = [];
@@ -133,12 +138,20 @@ export class DaemonRpc {
   private subscriptions: Map<number, grpc.ClientReadableStream<grpcTypes.DaemonEvent>> = new Map();
   private reconnectionTimeout?: NodeJS.Timer;
 
-  constructor(connectionParams: string) {
+  private constructor() {
     this.client = new ManagementServiceClient(
-      connectionParams,
+      DAEMON_RPC_PATH,
       grpc.credentials.createInsecure(),
       this.channelOptions(),
     );
+  }
+
+  public static getInstance(): DaemonRpc {
+    if (DaemonRpc.instance === undefined) {
+      DaemonRpc.instance = new DaemonRpc();
+    }
+
+    return DaemonRpc.instance;
   }
 
   public connect(): Promise<void> {
@@ -362,7 +375,7 @@ export class DaemonRpc {
     await this.call<grpcTypes.BridgeState, Empty>(this.client.setBridgeState, grpcBridgeState);
   }
 
-  public async setBridgeSettings(bridgeSettings: BridgeSettings): Promise<void> {
+  public async updateBridgeSettings(bridgeSettings: BridgeSettings): Promise<void> {
     const grpcBridgeSettings = new grpcTypes.BridgeSettings();
 
     if ('normal' in bridgeSettings) {

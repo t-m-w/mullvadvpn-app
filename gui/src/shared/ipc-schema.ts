@@ -27,7 +27,7 @@ interface ILogEntry {
   level: LogLevel;
   message: string;
 }
-import { invoke, invokeSync, notifyRenderer, send } from './ipc-helpers';
+import { invoke, invokeDaemon, invokeSync, notifyRenderer, send } from './ipc-helpers';
 import {
   IChangelog,
   ICurrentAppVersionInfo,
@@ -161,17 +161,17 @@ export const ipcSchema = {
   },
   settings: {
     '': notifyRenderer<ISettings>(),
-    setAllowLan: invoke<boolean, void>(),
-    setShowBetaReleases: invoke<boolean, void>(),
-    setEnableIpv6: invoke<boolean, void>(),
-    setBlockWhenDisconnected: invoke<boolean, void>(),
+    setAllowLan: invokeDaemon<boolean, void>(),
+    setShowBetaReleases: invokeDaemon<boolean, void>(),
+    setEnableIpv6: invokeDaemon<boolean, void>(),
+    setBlockWhenDisconnected: invokeDaemon<boolean, void>(),
     setBridgeState: invoke<BridgeState, void>(),
-    setOpenVpnMssfix: invoke<number | undefined, void>(),
-    setWireguardMtu: invoke<number | undefined, void>(),
-    updateRelaySettings: invoke<RelaySettingsUpdate, void>(),
-    updateBridgeSettings: invoke<BridgeSettings, void>(),
-    setDnsOptions: invoke<IDnsOptions, void>(),
-    setObfuscationSettings: invoke<ObfuscationSettings, void>(),
+    setOpenVpnMssfix: invokeDaemon<number | undefined, void>(),
+    setWireguardMtu: invokeDaemon<number | undefined, void>(),
+    updateRelaySettings: invokeDaemon<RelaySettingsUpdate, void>(),
+    updateBridgeSettings: invokeDaemon<BridgeSettings, void>(),
+    setDnsOptions: invokeDaemon<IDnsOptions, void>(),
+    setObfuscationSettings: invokeDaemon<ObfuscationSettings, void>(),
   },
   guiSettings: {
     '': notifyRenderer<IGuiSettingsState>(),
@@ -193,8 +193,8 @@ export const ipcSchema = {
     submitVoucher: invoke<string, VoucherResponse>(),
     updateData: send<void>(),
     getDeviceState: invoke<void, DeviceState>(),
-    listDevices: invoke<AccountToken, Array<IDevice>>(),
-    removeDevice: invoke<IDeviceRemoval, void>(),
+    listDevices: invokeDaemon<AccountToken, Array<IDevice>>(),
+    removeDevice: invokeDaemon<IDeviceRemoval, void>(),
   },
   accountHistory: {
     '': notifyRenderer<AccountToken | undefined>(),

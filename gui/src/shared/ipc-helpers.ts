@@ -1,5 +1,6 @@
 import { IpcMain as EIpcMain, IpcRenderer as EIpcRenderer, WebContents } from 'electron';
 
+import { DaemonRpc } from '../main/daemon-rpc';
 import log from './logging';
 import { capitalize } from './string-helpers';
 
@@ -20,8 +21,14 @@ interface RendererToMain<T, R> {
   receive: (event: string, ipcMain: EIpcMain) => Handler<T, R>;
 }
 
+interface RendererToDaemon<T, R> {
+  direction: 'renderer-to-daemon';
+  send: (event: string, ipcRenderer: EIpcRenderer) => Sender<T, R>;
+  receive: (event: string, ipcMain: EIpcMain) => Handler<T, R>;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyIpcCall = MainToRenderer<any> | RendererToMain<any, any>;
+type AnyIpcCall = MainToRenderer<any> | RendererToMain<any, any> | RendererToDaemon<any, any>;
 
 type Schema = Record<string, Record<string, AnyIpcCall>>;
 
@@ -29,7 +36,9 @@ type Schema = Record<string, Record<string, AnyIpcCall>>;
 // on direction.
 type IpcMainKey<N extends string, I extends AnyIpcCall> = I['direction'] extends 'main-to-renderer'
   ? `notify${Capitalize<N>}`
-  : `handle${Capitalize<N>}`;
+  : I['direction'] extends 'renderer-to-main'
+  ? `handle${Capitalize<N>}`
+  : never;
 
 // Selects either the send or receive function depending on direction.
 type IpcMainFn<I extends AnyIpcCall> = I['direction'] extends 'main-to-renderer'
@@ -40,7 +49,13 @@ type IpcMainFn<I extends AnyIpcCall> = I['direction'] extends 'main-to-renderer'
 type IpcRendererKey<
   N extends string,
   I extends AnyIpcCall
-> = I['direction'] extends 'main-to-renderer' ? `listen${Capitalize<N>}` : N;
+> = I['direction'] extends 'main-to-renderer'
+  ? `listen${Capitalize<N>}`
+  : I['direction'] extends 'renderer-to-main'
+  ? N
+  : N extends keyof DaemonRpc
+  ? N
+  : never;
 
 // Selects either the send or receive function depending on direction.
 type IpcRendererFn<I extends AnyIpcCall> = I['direction'] extends 'main-to-renderer'
@@ -62,8 +77,18 @@ type IpcRenderer<S extends Schema> = {
 };
 
 // Preforms the transformation of the main event channel in accordance with the above types.
-export function createIpcMain<S extends Schema>(schema: S, ipcMain: EIpcMain): IpcMain<S> {
+export function createIpcMain<S extends Schema>(
+  schema: S,
+  ipcMain: EIpcMain,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  daemonRpc: any,
+): IpcMain<S> {
   return createIpc(schema, (event, key, spec) => {
+    if (spec.direction === 'renderer-to-daemon') {
+      spec.receive(event, ipcMain)((...args) => daemonRpc[key](...args));
+      return undefined;
+    }
+
     const capitalizedKey = capitalize(key);
     const newKey =
       spec.direction === 'main-to-renderer' ? `notify${capitalizedKey}` : `handle${capitalizedKey}`;
@@ -94,16 +119,22 @@ export function createIpcRenderer<S extends Schema>(
 
 function createIpc<S extends Schema, T, R extends IpcMain<S> | IpcRenderer<S>>(
   ipc: S,
-  fn: (event: string, key: string, spec: AnyIpcCall) => [newKey: string, newValue: T],
+  fn: (event: string, key: string, spec: AnyIpcCall) => [newKey: string, newValue: T] | undefined,
 ): R {
   return Object.fromEntries(
     Object.entries(ipc).map(([groupKey, group]) => {
       const newGroup = Object.fromEntries(
-        Object.entries(group).map(([key, spec]) => fn(`${groupKey}-${key}`, key, spec)),
+        filterUndefined(
+          Object.entries(group).map(([key, spec]) => fn(`${groupKey}-${key}`, key, spec)),
+        ),
       );
       return [groupKey, newGroup];
     }),
   ) as R;
+}
+
+function filterUndefined<T>(array: Array<T | undefined>): Array<T> {
+  return array.filter((item) => item !== undefined) as Array<T>;
 }
 
 // Sends a request from the renderer process to the main process without any possibility to respond.
@@ -136,6 +167,16 @@ export function invokeSync<T, R>(): RendererToMain<T, R> {
 export function invoke<T, R>(): RendererToMain<T, Promise<R>> {
   return {
     direction: 'renderer-to-main',
+    send: invokeImpl,
+    receive: handle,
+  };
+}
+
+// Sends an asynchronous request from the renderer process to the daemon rpc through the main
+// process.
+export function invokeDaemon<T, R>(): RendererToDaemon<T, Promise<R>> {
+  return {
+    direction: 'renderer-to-daemon',
     send: invokeImpl,
     receive: handle,
   };

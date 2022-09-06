@@ -1,0 +1,44 @@
+@startuml overview-diagram
+hide empty description
+
+cloud {
+  [API]
+}
+
+cloud {
+  [Relays]
+}
+
+package "Mullvad android app" {
+    package "main process" {
+        [Messenger] as mainmessenger
+        [UI (activities, fragments etc)] as ui
+
+        mainmessenger -[hidden]d-> ui
+    }
+
+    package "vpn service process" {
+        [Messenger] as vpnmessenger
+        [VpnService]
+        [Daemon]
+
+        Daemon -[hidden]d-> vpnmessenger
+        vpnmessenger -[hidden]d-> VpnService
+    }
+
+    package "tile process" {
+        [Messenger] as tilemessenger
+        [TileService]
+    }
+}
+
+[mainmessenger] -right-> [vpnmessenger]
+[vpnmessenger] -left-> [mainmessenger]
+
+[tilemessenger] -left-> [vpnmessenger]
+[vpnmessenger] -right-> [tilemessenger]
+
+[Daemon] -u-> [API]
+[Daemon] -u-> [Relays]
+
+@enduml

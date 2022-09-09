@@ -1,6 +1,6 @@
 package net.mullvad.mullvadvpn.applist
 
-import net.mullvad.mullvadvpn.model.ListItemData
+import net.mullvad.core.model.ListItemData
 
 sealed class ViewIntent {
     // In future we will have search intent

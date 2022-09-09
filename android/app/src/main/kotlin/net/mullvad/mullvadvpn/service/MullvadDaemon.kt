@@ -2,22 +2,22 @@ package net.mullvad.mullvadvpn.service
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import net.mullvad.mullvadvpn.model.AppVersionInfo
-import net.mullvad.mullvadvpn.model.Device
-import net.mullvad.mullvadvpn.model.DeviceEvent
-import net.mullvad.mullvadvpn.model.DeviceListEvent
-import net.mullvad.mullvadvpn.model.DeviceState
-import net.mullvad.mullvadvpn.model.DnsOptions
-import net.mullvad.mullvadvpn.model.GeoIpLocation
-import net.mullvad.mullvadvpn.model.GetAccountDataResult
-import net.mullvad.mullvadvpn.model.LoginResult
-import net.mullvad.mullvadvpn.model.RelayList
-import net.mullvad.mullvadvpn.model.RelaySettingsUpdate
-import net.mullvad.mullvadvpn.model.RemoveDeviceEvent
-import net.mullvad.mullvadvpn.model.RemoveDeviceResult
-import net.mullvad.mullvadvpn.model.Settings
-import net.mullvad.mullvadvpn.model.TunnelState
-import net.mullvad.mullvadvpn.model.VoucherSubmissionResult
+import net.mullvad.core.model.AppVersionInfo
+import net.mullvad.core.model.Device
+import net.mullvad.core.model.DeviceEvent
+import net.mullvad.core.model.DeviceListEvent
+import net.mullvad.core.model.DeviceState
+import net.mullvad.core.model.DnsOptions
+import net.mullvad.core.model.GeoIpLocation
+import net.mullvad.core.model.GetAccountDataResult
+import net.mullvad.core.model.LoginResult
+import net.mullvad.core.model.RelayList
+import net.mullvad.core.model.RelaySettingsUpdate
+import net.mullvad.core.model.RemoveDeviceEvent
+import net.mullvad.core.model.RemoveDeviceResult
+import net.mullvad.core.model.Settings
+import net.mullvad.core.model.TunnelState
+import net.mullvad.core.model.VoucherSubmissionResult
 import net.mullvad.talpid.util.EventNotifier
 
 class MullvadDaemon(vpnService: MullvadVpnService) {

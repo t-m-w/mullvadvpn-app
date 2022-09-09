@@ -1,0 +1,12 @@
+package net.mullvad.core.model
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+sealed class RelaySettings : Parcelable {
+    @Parcelize
+    object CustomTunnelEndpoint : RelaySettings()
+
+    @Parcelize
+    class Normal(val relayConstraints: RelayConstraints) : RelaySettings()
+}

@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.Settings
+import net.mullvad.core.model.Settings
 import net.mullvad.mullvadvpn.ui.customdns.CustomDnsAdapter
 import net.mullvad.mullvadvpn.ui.extension.requireMainActivity
 import net.mullvad.mullvadvpn.ui.fragments.BaseFragment

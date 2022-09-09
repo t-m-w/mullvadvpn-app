@@ -19,8 +19,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.ipc.ServiceConnection
-import net.mullvad.mullvadvpn.model.ServiceResult
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.ServiceResult
+import net.mullvad.core.model.TunnelState
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 
 class MullvadTileService : TileService() {

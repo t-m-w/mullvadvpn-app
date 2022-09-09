@@ -1,7 +1,7 @@
 package net.mullvad.mullvadvpn.util
 
 import kotlin.reflect.KClass
-import net.mullvad.mullvadvpn.model.DeviceState
+import net.mullvad.core.model.DeviceState
 
 const val UNKNOWN_STATE_DEBOUNCE_DELAY_MILLISECONDS = 2000L
 private const val ZERO_DEBOUNCE_DELAY_MILLISECONDS = 0L

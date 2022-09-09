@@ -5,7 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.MessageDispatcher
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.VoucherSubmissionResult
+import net.mullvad.core.model.VoucherSubmissionResult
 
 class VoucherRedeemer(val connection: Messenger, eventDispatcher: MessageDispatcher<Event>) {
     private val activeSubmissions =

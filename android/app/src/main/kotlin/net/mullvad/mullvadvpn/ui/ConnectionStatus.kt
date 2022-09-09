@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 
 class ConnectionStatus(val parentView: View, context: Context) {

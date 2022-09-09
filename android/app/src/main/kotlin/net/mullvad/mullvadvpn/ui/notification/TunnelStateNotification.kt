@@ -2,7 +2,7 @@ package net.mullvad.mullvadvpn.ui.notification
 
 import android.content.Context
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 import net.mullvad.talpid.tunnel.ErrorState
 import net.mullvad.talpid.tunnel.ErrorStateCause

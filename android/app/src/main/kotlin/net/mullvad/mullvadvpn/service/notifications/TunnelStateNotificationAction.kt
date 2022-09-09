@@ -1,7 +1,7 @@
 package net.mullvad.mullvadvpn.service.notifications
 
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.service.MullvadVpnService
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 

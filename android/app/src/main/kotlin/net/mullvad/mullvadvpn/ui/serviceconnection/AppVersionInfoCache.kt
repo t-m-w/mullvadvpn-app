@@ -3,7 +3,7 @@ package net.mullvad.mullvadvpn.ui.serviceconnection
 import kotlin.properties.Delegates.observable
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.EventDispatcher
-import net.mullvad.mullvadvpn.model.AppVersionInfo
+import net.mullvad.core.model.AppVersionInfo
 
 class AppVersionInfoCache(
     eventDispatcher: EventDispatcher,

@@ -3,19 +3,19 @@ package net.mullvad.mullvadvpn.ipc
 import android.os.Message as RawMessage
 import android.os.Messenger
 import kotlinx.parcelize.Parcelize
-import net.mullvad.mullvadvpn.model.AccountCreationResult
-import net.mullvad.mullvadvpn.model.AccountExpiry
-import net.mullvad.mullvadvpn.model.AccountHistory
-import net.mullvad.mullvadvpn.model.AppVersionInfo as AppVersionInfoData
-import net.mullvad.mullvadvpn.model.DeviceListEvent
-import net.mullvad.mullvadvpn.model.DeviceState
-import net.mullvad.mullvadvpn.model.GeoIpLocation
-import net.mullvad.mullvadvpn.model.LoginResult
-import net.mullvad.mullvadvpn.model.RelayList
-import net.mullvad.mullvadvpn.model.RemoveDeviceResult
-import net.mullvad.mullvadvpn.model.Settings
-import net.mullvad.mullvadvpn.model.TunnelState
-import net.mullvad.mullvadvpn.model.VoucherSubmissionResult as VoucherSubmissionResultData
+import net.mullvad.core.model.AccountCreationResult
+import net.mullvad.core.model.AccountExpiry
+import net.mullvad.core.model.AccountHistory
+import net.mullvad.core.model.AppVersionInfo as AppVersionInfoData
+import net.mullvad.core.model.DeviceListEvent
+import net.mullvad.core.model.DeviceState
+import net.mullvad.core.model.GeoIpLocation
+import net.mullvad.core.model.LoginResult
+import net.mullvad.core.model.RelayList
+import net.mullvad.core.model.RemoveDeviceResult
+import net.mullvad.core.model.Settings
+import net.mullvad.core.model.TunnelState
+import net.mullvad.core.model.VoucherSubmissionResult as VoucherSubmissionResultData
 
 // Events that can be sent from the service
 sealed class Event : Message.EventMessage() {

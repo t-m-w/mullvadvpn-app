@@ -21,9 +21,9 @@ import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.applist.ViewIntent
 import net.mullvad.mullvadvpn.di.APPS_SCOPE
 import net.mullvad.mullvadvpn.di.SERVICE_CONNECTION_SCOPE
-import net.mullvad.mullvadvpn.model.ListItemData
-import net.mullvad.mullvadvpn.model.WidgetState.ImageState
-import net.mullvad.mullvadvpn.model.WidgetState.SwitchState
+import net.mullvad.core.model.ListItemData
+import net.mullvad.core.model.WidgetState.ImageState
+import net.mullvad.core.model.WidgetState.SwitchState
 import net.mullvad.mullvadvpn.ui.ListItemDividerDecoration
 import net.mullvad.mullvadvpn.ui.ListItemListener
 import net.mullvad.mullvadvpn.ui.ListItemsAdapter

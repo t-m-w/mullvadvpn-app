@@ -8,9 +8,9 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.sendBlocking
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.DnsOptions
-import net.mullvad.mullvadvpn.model.RelaySettings
-import net.mullvad.mullvadvpn.model.Settings
+import net.mullvad.core.model.DnsOptions
+import net.mullvad.core.model.RelaySettings
+import net.mullvad.core.model.Settings
 import net.mullvad.mullvadvpn.service.MullvadDaemon
 import net.mullvad.talpid.util.EventNotifier
 

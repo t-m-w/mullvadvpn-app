@@ -1,12 +1,12 @@
 package net.mullvad.mullvadvpn.relaylist
 
-import net.mullvad.mullvadvpn.model.Constraint
-import net.mullvad.mullvadvpn.model.LocationConstraint
+import net.mullvad.core.model.Constraint
+import net.mullvad.core.model.LocationConstraint
 
 class RelayList {
     val countries: List<RelayCountry>
 
-    constructor(model: net.mullvad.mullvadvpn.model.RelayList) {
+    constructor(model: net.mullvad.core.model.RelayList) {
         var relayCountries = model.countries
             .map { country ->
                 val cities = mutableListOf<RelayCity>()

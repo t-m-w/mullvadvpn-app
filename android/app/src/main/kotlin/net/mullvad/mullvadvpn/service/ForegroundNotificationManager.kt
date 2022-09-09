@@ -9,8 +9,8 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
-import net.mullvad.mullvadvpn.model.DeviceState
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.DeviceState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.service.endpoint.ConnectionProxy
 import net.mullvad.mullvadvpn.service.notifications.TunnelStateNotification
 import net.mullvad.mullvadvpn.util.Intermittent

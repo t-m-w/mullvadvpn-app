@@ -4,9 +4,9 @@ import android.os.Messenger
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.EventDispatcher
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.DnsOptions
-import net.mullvad.mullvadvpn.model.RelaySettings
-import net.mullvad.mullvadvpn.model.Settings
+import net.mullvad.core.model.DnsOptions
+import net.mullvad.core.model.RelaySettings
+import net.mullvad.core.model.Settings
 import net.mullvad.talpid.util.EventNotifier
 
 class SettingsListener(private val connection: Messenger, eventDispatcher: EventDispatcher) {

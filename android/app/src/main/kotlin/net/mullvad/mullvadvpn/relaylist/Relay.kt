@@ -1,6 +1,6 @@
 package net.mullvad.mullvadvpn.relaylist
 
-import net.mullvad.mullvadvpn.model.LocationConstraint
+import net.mullvad.core.model.LocationConstraint
 
 data class Relay(
     val city: RelayCity,

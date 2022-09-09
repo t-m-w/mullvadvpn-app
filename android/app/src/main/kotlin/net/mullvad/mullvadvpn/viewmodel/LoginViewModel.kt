@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import net.mullvad.mullvadvpn.model.AccountCreationResult
-import net.mullvad.mullvadvpn.model.LoginResult
+import net.mullvad.core.model.AccountCreationResult
+import net.mullvad.core.model.LoginResult
 import net.mullvad.mullvadvpn.ui.serviceconnection.AccountRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository
 

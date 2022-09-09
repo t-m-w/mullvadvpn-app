@@ -4,10 +4,10 @@ import android.os.Messenger
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.EventDispatcher
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.Constraint
-import net.mullvad.mullvadvpn.model.LocationConstraint
-import net.mullvad.mullvadvpn.model.RelayConstraints
-import net.mullvad.mullvadvpn.model.RelaySettings
+import net.mullvad.core.model.Constraint
+import net.mullvad.core.model.LocationConstraint
+import net.mullvad.core.model.RelayConstraints
+import net.mullvad.core.model.RelaySettings
 import net.mullvad.mullvadvpn.relaylist.RelayItem
 import net.mullvad.mullvadvpn.relaylist.RelayList
 

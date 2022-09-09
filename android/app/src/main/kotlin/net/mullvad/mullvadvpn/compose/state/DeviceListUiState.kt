@@ -1,6 +1,6 @@
 package net.mullvad.mullvadvpn.compose.state
 
-import net.mullvad.mullvadvpn.model.Device
+import net.mullvad.core.model.Device
 
 data class DeviceListUiState(
     val deviceUiItems: List<DeviceListItemUiState>,

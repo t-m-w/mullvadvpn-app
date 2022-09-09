@@ -2,7 +2,7 @@ package net.mullvad.mullvadvpn.service.endpoint
 
 import kotlin.properties.Delegates.observable
 import net.mullvad.mullvadvpn.ipc.Event
-import net.mullvad.mullvadvpn.model.AppVersionInfo
+import net.mullvad.core.model.AppVersionInfo
 import net.mullvad.mullvadvpn.service.MullvadDaemon
 
 class AppVersionInfoCache(endpoint: ServiceEndpoint) {

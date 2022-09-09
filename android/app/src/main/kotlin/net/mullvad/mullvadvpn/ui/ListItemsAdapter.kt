@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import java.util.concurrent.atomic.AtomicLong
-import net.mullvad.mullvadvpn.model.ListItemData
+import net.mullvad.core.model.ListItemData
 import net.mullvad.mullvadvpn.ui.listitemview.ActionListItemView
 import net.mullvad.mullvadvpn.ui.listitemview.ApplicationListItemView
 import net.mullvad.mullvadvpn.ui.listitemview.DividerGroupListItemView

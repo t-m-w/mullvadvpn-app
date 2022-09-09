@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import net.mullvad.mullvadvpn.ipc.Event
-import net.mullvad.mullvadvpn.model.Constraint
-import net.mullvad.mullvadvpn.model.GeoIpLocation
-import net.mullvad.mullvadvpn.model.RelaySettings
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.Constraint
+import net.mullvad.core.model.GeoIpLocation
+import net.mullvad.core.model.RelaySettings
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.util.ExponentialBackoff
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 

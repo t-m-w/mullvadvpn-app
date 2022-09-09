@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.sendBlocking
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.talpid.util.EventNotifier
 
 class ConnectionProxy(val vpnPermission: VpnPermission, endpoint: ServiceEndpoint) {

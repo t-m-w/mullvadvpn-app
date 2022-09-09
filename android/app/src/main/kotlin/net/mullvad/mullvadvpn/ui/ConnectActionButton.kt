@@ -5,7 +5,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
 import android.widget.ImageButton
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 
 class ConnectActionButton(val parentView: View) {

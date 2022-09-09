@@ -9,11 +9,11 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.sendBlocking
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.Constraint
-import net.mullvad.mullvadvpn.model.LocationConstraint
-import net.mullvad.mullvadvpn.model.RelayConstraintsUpdate
-import net.mullvad.mullvadvpn.model.RelayList
-import net.mullvad.mullvadvpn.model.RelaySettingsUpdate
+import net.mullvad.core.model.Constraint
+import net.mullvad.core.model.LocationConstraint
+import net.mullvad.core.model.RelayConstraintsUpdate
+import net.mullvad.core.model.RelayList
+import net.mullvad.core.model.RelaySettingsUpdate
 import net.mullvad.mullvadvpn.service.MullvadDaemon
 
 class RelayListListener(endpoint: ServiceEndpoint) {

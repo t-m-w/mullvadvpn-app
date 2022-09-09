@@ -20,9 +20,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.compose.state.DeviceListItemUiState
 import net.mullvad.mullvadvpn.compose.state.DeviceListUiState
-import net.mullvad.mullvadvpn.model.Device
-import net.mullvad.mullvadvpn.model.DeviceList
-import net.mullvad.mullvadvpn.model.RemoveDeviceResult
+import net.mullvad.core.model.Device
+import net.mullvad.core.model.DeviceList
+import net.mullvad.core.model.RemoveDeviceResult
 import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository
 
 typealias DeviceId = String

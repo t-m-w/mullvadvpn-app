@@ -16,8 +16,8 @@ import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.applist.AppData
 import net.mullvad.mullvadvpn.applist.ApplicationsProvider
 import net.mullvad.mullvadvpn.applist.ViewIntent
-import net.mullvad.mullvadvpn.model.ListItemData
-import net.mullvad.mullvadvpn.model.WidgetState
+import net.mullvad.core.model.ListItemData
+import net.mullvad.core.model.WidgetState
 import net.mullvad.mullvadvpn.ui.serviceconnection.SplitTunneling
 
 class SplitTunnelingViewModel(

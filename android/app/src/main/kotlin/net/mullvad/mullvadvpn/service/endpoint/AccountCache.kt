@@ -9,10 +9,10 @@ import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.collect
 import net.mullvad.mullvadvpn.ipc.Event
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.AccountCreationResult
-import net.mullvad.mullvadvpn.model.AccountExpiry
-import net.mullvad.mullvadvpn.model.AccountHistory
-import net.mullvad.mullvadvpn.model.GetAccountDataResult
+import net.mullvad.core.model.AccountCreationResult
+import net.mullvad.core.model.AccountExpiry
+import net.mullvad.core.model.AccountHistory
+import net.mullvad.core.model.GetAccountDataResult
 import net.mullvad.mullvadvpn.util.JobTracker
 import net.mullvad.talpid.util.EventNotifier
 import org.joda.time.DateTime

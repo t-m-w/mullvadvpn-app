@@ -4,7 +4,7 @@ import android.os.Message as RawMessage
 import android.os.Messenger
 import java.net.InetAddress
 import kotlinx.parcelize.Parcelize
-import net.mullvad.mullvadvpn.model.LocationConstraint
+import net.mullvad.core.model.LocationConstraint
 
 // Requests that the service can handle
 sealed class Request : Message.RequestMessage() {

@@ -15,10 +15,10 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import net.mullvad.mullvadvpn.ipc.Event
-import net.mullvad.mullvadvpn.model.AccountCreationResult
-import net.mullvad.mullvadvpn.model.AccountHistory
-import net.mullvad.mullvadvpn.model.DeviceListEvent
-import net.mullvad.mullvadvpn.model.LoginResult
+import net.mullvad.core.model.AccountCreationResult
+import net.mullvad.core.model.AccountHistory
+import net.mullvad.core.model.DeviceListEvent
+import net.mullvad.core.model.LoginResult
 import net.mullvad.mullvadvpn.ui.serviceconnection.AccountRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.ServiceConnectionContainer

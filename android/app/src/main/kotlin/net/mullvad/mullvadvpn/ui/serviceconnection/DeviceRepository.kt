@@ -16,9 +16,9 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withTimeoutOrNull
 import net.mullvad.mullvadvpn.ipc.Event
-import net.mullvad.mullvadvpn.model.DeviceList
-import net.mullvad.mullvadvpn.model.DeviceListEvent
-import net.mullvad.mullvadvpn.model.DeviceState
+import net.mullvad.core.model.DeviceList
+import net.mullvad.core.model.DeviceListEvent
+import net.mullvad.core.model.DeviceState
 
 class DeviceRepository(
     private val serviceConnectionManager: ServiceConnectionManager,

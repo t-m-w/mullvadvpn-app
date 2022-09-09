@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.Device
+import net.mullvad.core.model.Device
 import net.mullvad.mullvadvpn.util.capitalizeFirstCharOfEachWord
 import net.mullvad.mullvadvpn.viewmodel.DeviceListViewModel
 

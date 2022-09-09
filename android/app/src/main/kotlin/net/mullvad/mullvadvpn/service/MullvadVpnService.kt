@@ -12,8 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import net.mullvad.mullvadvpn.model.Settings
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.Settings
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.service.endpoint.ServiceEndpoint
 import net.mullvad.mullvadvpn.service.notifications.AccountExpiryNotification
 import net.mullvad.mullvadvpn.ui.MainActivity

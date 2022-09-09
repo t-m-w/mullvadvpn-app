@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import kotlin.properties.Delegates.observable
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.relaylist.RelayItem
 import net.mullvad.talpid.tunnel.ActionAfterDisconnect
 

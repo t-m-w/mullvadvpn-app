@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import kotlin.properties.Delegates.observable
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.TunnelState
+import net.mullvad.core.model.TunnelState
 import net.mullvad.mullvadvpn.ui.MainActivity
 import net.mullvad.mullvadvpn.ui.StatusBarPainter
 import net.mullvad.mullvadvpn.ui.paintStatusBar

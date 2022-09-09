@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.sendBlocking
 import net.mullvad.mullvadvpn.ipc.Request
-import net.mullvad.mullvadvpn.model.DnsOptions
+import net.mullvad.core.model.DnsOptions
 
 class CustomDns(private val endpoint: ServiceEndpoint) {
     private sealed class Command {

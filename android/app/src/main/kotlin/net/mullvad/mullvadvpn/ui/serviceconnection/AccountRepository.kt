@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import net.mullvad.mullvadvpn.ipc.Event
-import net.mullvad.mullvadvpn.model.AccountCreationResult
-import net.mullvad.mullvadvpn.model.AccountExpiry
-import net.mullvad.mullvadvpn.model.AccountHistory
+import net.mullvad.core.model.AccountCreationResult
+import net.mullvad.core.model.AccountExpiry
+import net.mullvad.core.model.AccountHistory
 import net.mullvad.mullvadvpn.util.flatMapReadyConnectionOrDefault
 
 class AccountRepository(

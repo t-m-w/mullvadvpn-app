@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import kotlin.properties.Delegates.observable
 import kotlinx.coroutines.delay
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.model.AccountExpiry
+import net.mullvad.core.model.AccountExpiry
 import net.mullvad.mullvadvpn.service.MullvadDaemon
 import net.mullvad.mullvadvpn.service.endpoint.AccountCache
 import net.mullvad.mullvadvpn.util.Intermittent

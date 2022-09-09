@@ -26,8 +26,8 @@ import net.mullvad.mullvadvpn.RecyclerViewMatcher.Companion.withRecyclerView
 import net.mullvad.mullvadvpn.applist.ApplicationsIconManager
 import net.mullvad.mullvadvpn.applist.ViewIntent
 import net.mullvad.mullvadvpn.di.APPS_SCOPE
-import net.mullvad.mullvadvpn.model.ListItemData
-import net.mullvad.mullvadvpn.model.WidgetState
+import net.mullvad.core.model.ListItemData
+import net.mullvad.core.model.WidgetState
 import net.mullvad.mullvadvpn.viewmodel.SplitTunnelingViewModel
 import org.junit.After
 import org.junit.Before

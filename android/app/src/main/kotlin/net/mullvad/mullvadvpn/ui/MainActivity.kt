@@ -27,8 +27,8 @@ import net.mullvad.mullvadvpn.BuildConfig
 import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.dataproxy.MullvadProblemReport
 import net.mullvad.mullvadvpn.di.uiModule
-import net.mullvad.mullvadvpn.model.AccountExpiry
-import net.mullvad.mullvadvpn.model.DeviceState
+import net.mullvad.core.model.AccountExpiry
+import net.mullvad.core.model.DeviceState
 import net.mullvad.mullvadvpn.ui.fragments.DeviceRevokedFragment
 import net.mullvad.mullvadvpn.ui.serviceconnection.AccountRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository

@@ -17,13 +17,13 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import net.mullvad.core.model.ListItemData
+import net.mullvad.core.model.WidgetState.ImageState
+import net.mullvad.core.model.WidgetState.SwitchState
 import net.mullvad.mullvadvpn.R
 import net.mullvad.mullvadvpn.applist.ViewIntent
 import net.mullvad.mullvadvpn.di.APPS_SCOPE
 import net.mullvad.mullvadvpn.di.SERVICE_CONNECTION_SCOPE
-import net.mullvad.core.model.ListItemData
-import net.mullvad.core.model.WidgetState.ImageState
-import net.mullvad.core.model.WidgetState.SwitchState
 import net.mullvad.mullvadvpn.ui.ListItemDividerDecoration
 import net.mullvad.mullvadvpn.ui.ListItemListener
 import net.mullvad.mullvadvpn.ui.ListItemsAdapter
@@ -54,7 +54,9 @@ class SplitTunnelingFragment : BaseFragment(R.layout.collapsed_title_layout) {
         override fun onItemAction(item: ListItemData) {
             when (item.widget) {
                 is ImageState -> toggleExcludeChannel.offer(item)
-                is SwitchState -> toggleSystemAppsVisibility.offer(!item.widget.isChecked)
+                is SwitchState -> toggleSystemAppsVisibility.offer(
+                    (item.widget as SwitchState).isChecked
+                )
             }
         }
     }

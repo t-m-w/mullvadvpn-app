@@ -38,6 +38,8 @@ configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
 }
 
 dependencies {
+    implementation(project(Dependencies.Mullvad.talpid))
+
     implementation(Dependencies.AndroidX.coreKtx)
     implementation(Dependencies.AndroidX.lifecycleRuntimeKtx)
     implementation(Dependencies.jodaTime)

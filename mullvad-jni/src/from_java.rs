@@ -60,9 +60,9 @@ where
     type JavaType = JObject<'env>;
 
     fn from_java(env: &JnixEnv<'env>, source: Self::JavaType) -> Self {
-        if is_instance_of(env, source, "net/mullvad/mullvadvpn/model/Constraint$Any") {
+        if is_instance_of(env, source, "net/mullvad/core/model/Constraint$Any") {
             Constraint::Any
-        } else if is_instance_of(env, source, "net/mullvad/mullvadvpn/model/Constraint$Only") {
+        } else if is_instance_of(env, source, "net/mullvad/core/model/Constraint$Only") {
             let value = get_object_field(env, source, "value", "Ljava/lang/Object;");
 
             Constraint::Only(T::from_java(env, T::JavaType::from(value)))
@@ -76,9 +76,9 @@ impl<'env> FromJava<'env> for LocationConstraint {
     type JavaType = JObject<'env>;
 
     fn from_java(env: &JnixEnv<'env>, source: Self::JavaType) -> Self {
-        let country_class = "net/mullvad/mullvadvpn/model/LocationConstraint$Country";
-        let city_class = "net/mullvad/mullvadvpn/model/LocationConstraint$City";
-        let hostname_class = "net/mullvad/mullvadvpn/model/LocationConstraint$Hostname";
+        let country_class = "net/mullvad/core/model/LocationConstraint$Country";
+        let city_class = "net/mullvad/core/model/LocationConstraint$City";
+        let hostname_class = "net/mullvad/core/model/LocationConstraint$Hostname";
 
         if is_instance_of(env, source, country_class) {
             let country = get_string_field(env, source, "countryCode");
@@ -116,7 +116,7 @@ impl<'env> FromJava<'env> for RelayConstraintsUpdate {
             env,
             source,
             "location",
-            "Lnet/mullvad/mullvadvpn/model/Constraint;",
+            "Lnet/mullvad/core/model/Constraint;",
         );
 
         RelayConstraintsUpdate {
@@ -133,9 +133,9 @@ impl<'env> FromJava<'env> for RelaySettingsUpdate {
 
     fn from_java(env: &JnixEnv<'env>, source: Self::JavaType) -> Self {
         let custom_tunnel_endpoint_class =
-            "net/mullvad/mullvadvpn/model/RelaySettingsUpdate$CustomTunnelEndpoint";
+            "net/mullvad/core/model/RelaySettingsUpdate$CustomTunnelEndpoint";
         let relay_constraints_update_class =
-            "net/mullvad/mullvadvpn/model/RelaySettingsUpdate$RelayConstraintsUpdate";
+            "net/mullvad/core/model/RelaySettingsUpdate$RelayConstraintsUpdate";
 
         if is_instance_of(env, source, custom_tunnel_endpoint_class) {
             unimplemented!("Can't specify custom tunnels from Android app");

@@ -130,37 +130,37 @@ impl<'env> JniEventHandler<'env> {
             &env,
             &class,
             "notifyAppVersionInfoEvent",
-            "(Lnet/mullvad/mullvadvpn/model/AppVersionInfo;)V",
+            "(Lnet/mullvad/core/model/AppVersionInfo;)V",
         )?;
         let notify_relay_list_event = Self::get_method_id(
             &env,
             &class,
             "notifyRelayListEvent",
-            "(Lnet/mullvad/mullvadvpn/model/RelayList;)V",
+            "(Lnet/mullvad/core/model/RelayList;)V",
         )?;
         let notify_settings_event = Self::get_method_id(
             &env,
             &class,
             "notifySettingsEvent",
-            "(Lnet/mullvad/mullvadvpn/model/Settings;)V",
+            "(Lnet/mullvad/core/model/Settings;)V",
         )?;
         let notify_tunnel_event = Self::get_method_id(
             &env,
             &class,
             "notifyTunnelStateEvent",
-            "(Lnet/mullvad/mullvadvpn/model/TunnelState;)V",
+            "(Lnet/mullvad/core/model/TunnelState;)V",
         )?;
         let notify_device_event = Self::get_method_id(
             &env,
             &class,
             "notifyDeviceEvent",
-            "(Lnet/mullvad/mullvadvpn/model/DeviceEvent;)V",
+            "(Lnet/mullvad/core/model/DeviceEvent;)V",
         )?;
         let notify_remove_device_event = Self::get_method_id(
             &env,
             &class,
             "notifyRemoveDeviceEvent",
-            "(Lnet/mullvad/mullvadvpn/model/RemoveDeviceEvent;)V",
+            "(Lnet/mullvad/core/model/RemoveDeviceEvent;)V",
         )?;
 
         Ok(JniEventHandler {

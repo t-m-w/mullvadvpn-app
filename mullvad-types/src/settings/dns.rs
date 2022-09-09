@@ -59,7 +59,7 @@ impl<'env, 'sub_env> FromJava<'env, JObject<'sub_env>> for DnsOptions
 where
     'env: 'sub_env,
 {
-    const JNI_SIGNATURE: &'static str = "Lnet/mullvad/mullvadvpn/model/DnsOptions";
+    const JNI_SIGNATURE: &'static str = "Lnet/mullvad/core/model/DnsOptions";
 
     fn from_java(env: &JnixEnv<'env>, object: JObject<'sub_env>) -> Self {
         AndroidDnsOptions::from_java(env, object).into()

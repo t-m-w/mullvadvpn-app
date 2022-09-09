@@ -101,6 +101,7 @@ object Dependencies {
     }
 
     object Mullvad {
+        const val core = ":core"
         const val talpid = ":talpid"
     }
 }

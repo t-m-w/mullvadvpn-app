@@ -167,6 +167,7 @@ play {
 }
 
 dependencies {
+    implementation(project(Dependencies.Mullvad.core))
     implementation(project(Dependencies.Mullvad.talpid))
 
     implementation(Dependencies.androidMaterial)

@@ -137,7 +137,7 @@ pub struct AmIMullvad {
 /// GeoIP information exposed from the daemon to frontends.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct GeoIpLocation {
     pub ipv4: Option<Ipv4Addr>,
     pub ipv6: Option<Ipv6Addr>,

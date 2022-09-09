@@ -24,7 +24,7 @@ pub trait Set<T> {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[cfg_attr(target_os = "android", derive(FromJava, IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[cfg_attr(target_os = "android", jnix(bounds = "T: android.os.Parcelable"))]
 pub enum Constraint<T: fmt::Debug + Clone + Eq + PartialEq> {
     Any,
@@ -141,7 +141,7 @@ impl<T: fmt::Debug + Clone + Eq + PartialEq> From<Option<T>> for Constraint<T> {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum RelaySettings {
     CustomTunnelEndpoint(CustomTunnelEndpoint),
     Normal(RelayConstraints),
@@ -179,7 +179,7 @@ impl RelaySettings {
 #[serde(default)]
 #[cfg_attr(not(target_os = "android"), derive(Default))]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct RelayConstraints {
     pub location: Constraint<LocationConstraint>,
     #[cfg_attr(target_os = "android", jnix(skip))]
@@ -269,7 +269,7 @@ impl fmt::Display for RelayConstraints {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[cfg_attr(target_os = "android", derive(FromJava, IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum LocationConstraint {
     /// A country is represented by its two letter country code.
     Country(CountryCode),
@@ -589,7 +589,7 @@ pub struct InternalBridgeConstraints {
 /// Used to update the [`RelaySettings`] used in `mullvad-daemon`.
 #[derive(Debug, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(FromJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[serde(rename_all = "snake_case")]
 pub enum RelaySettingsUpdate {
     #[cfg_attr(target_os = "android", jnix(deny))]
@@ -621,7 +621,7 @@ impl RelaySettingsUpdate {
 /// Used in [`RelaySettings`] to change relay constraints in the daemon.
 #[derive(Debug, Default, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(FromJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[serde(default)]
 pub struct RelayConstraintsUpdate {
     pub location: Option<Constraint<LocationConstraint>>,

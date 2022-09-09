@@ -32,7 +32,7 @@ impl fmt::Display for TargetState {
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "state", content = "details")]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum TunnelState {
     Disconnected,
     Connecting {

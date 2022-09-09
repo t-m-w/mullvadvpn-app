@@ -20,7 +20,7 @@ pub enum Error {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 // TODO: Remove this Java conversion once `jnix` supports skipping fields in enum tuple variants.
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[cfg_attr(target_os = "android", jnix(skip_all))]
 pub struct CustomTunnelEndpoint {
     pub host: String,

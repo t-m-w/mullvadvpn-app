@@ -64,7 +64,7 @@ impl Serialize for SettingsVersion {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct Settings {
     relay_settings: RelaySettings,
     #[cfg_attr(target_os = "android", jnix(skip))]
@@ -188,7 +188,7 @@ impl Settings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct TunnelOptions {
     /// openvpn holds OpenVPN specific tunnel options.
     #[cfg_attr(target_os = "android", jnix(skip))]

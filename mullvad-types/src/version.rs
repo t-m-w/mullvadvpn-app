@@ -17,7 +17,7 @@ lazy_static::lazy_static! {
 /// Mullvad VPN app.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct AppVersionInfo {
     /// False if Mullvad has stopped supporting the currently running version. This could mean
     /// a number of things. For example:

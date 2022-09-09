@@ -15,7 +15,7 @@ pub type DeviceName = String;
 /// Contains data for a device returned by the API.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct Device {
     pub id: DeviceId,
     pub name: DeviceName,
@@ -52,7 +52,7 @@ impl Device {
 /// Ports associated with a device.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct DevicePort {
     /// Port identifier.
     pub id: String,
@@ -68,7 +68,7 @@ impl fmt::Display for DevicePort {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum DeviceState {
     LoggedIn(AccountAndDevice),
     LoggedOut,
@@ -87,7 +87,7 @@ impl DeviceState {
 /// A [Device] and its associated account token.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct AccountAndDevice {
     pub account_token: AccountToken,
     pub device: Device,
@@ -105,7 +105,7 @@ impl AccountAndDevice {
 /// Reason why a [DeviceEvent] was emitted.
 #[derive(Clone, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum DeviceEventCause {
     /// Logged in on a new device.
     LoggedIn,
@@ -122,7 +122,7 @@ pub enum DeviceEventCause {
 /// Emitted when logging in or out of an account, or when the device changes.
 #[derive(Clone, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct DeviceEvent {
     pub cause: DeviceEventCause,
     pub new_state: DeviceState,
@@ -132,7 +132,7 @@ pub struct DeviceEvent {
 /// This is not sent by a normal logout or when it is revoked remotely.
 #[derive(Clone, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct RemoveDeviceEvent {
     pub account_token: AccountToken,
     pub new_devices: Vec<Device>,

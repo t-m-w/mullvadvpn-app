@@ -119,7 +119,7 @@ impl Default for RotationInterval {
 #[cfg_attr(target_os = "android", derive(IntoJava))]
 #[cfg_attr(
     target_os = "android",
-    jnix(class_name = "net.mullvad.mullvadvpn.model.WireguardTunnelOptions")
+    jnix(class_name = "net.mullvad.core.model.WireguardTunnelOptions")
 )]
 pub struct TunnelOptions {
     #[serde(flatten)]
@@ -132,7 +132,7 @@ pub struct TunnelOptions {
 /// Represents a published public key
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct PublicKey {
     #[cfg_attr(target_os = "android", jnix(map = "|key| *key.as_bytes()"))]
     pub key: wireguard::PublicKey,

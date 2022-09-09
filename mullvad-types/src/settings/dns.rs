@@ -15,7 +15,7 @@ pub enum DnsState {
 #[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
 #[serde(default)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct DnsOptions {
     #[cfg_attr(target_os = "android", jnix(map = "|state| state == DnsState::Custom"))]
     pub state: DnsState,
@@ -30,7 +30,7 @@ pub struct DnsOptions {
 #[cfg_attr(target_os = "android", derive(FromJava))]
 #[cfg_attr(
     target_os = "android",
-    jnix(class_name = "net.mullvad.mullvadvpn.model.DnsOptions")
+    jnix(class_name = "net.mullvad.core.model.DnsOptions")
 )]
 pub struct AndroidDnsOptions {
     pub custom: bool,

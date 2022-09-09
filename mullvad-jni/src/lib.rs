@@ -66,7 +66,7 @@ pub enum Error {
 }
 
 #[derive(IntoJava)]
-#[jnix(package = "net.mullvad.mullvadvpn.model")]
+#[jnix(package = "net.mullvad.core.model")]
 pub enum GetAccountDataResult {
     Ok(AccountData),
     InvalidAccount,
@@ -92,7 +92,7 @@ impl From<Result<AccountData, daemon_interface::Error>> for GetAccountDataResult
 }
 
 #[derive(IntoJava)]
-#[jnix(package = "net.mullvad.mullvadvpn.model")]
+#[jnix(package = "net.mullvad.core.model")]
 pub enum LoginResult {
     Ok,
     InvalidAccount,
@@ -122,7 +122,7 @@ impl From<Result<(), daemon_interface::Error>> for LoginResult {
 }
 
 #[derive(IntoJava)]
-#[jnix(package = "net.mullvad.mullvadvpn.model")]
+#[jnix(package = "net.mullvad.core.model")]
 pub enum RemoveDeviceResult {
     Ok,
     NotFound,
@@ -151,14 +151,14 @@ impl From<Result<(), daemon_interface::Error>> for RemoveDeviceResult {
 }
 
 #[derive(IntoJava)]
-#[jnix(package = "net.mullvad.mullvadvpn.model")]
+#[jnix(package = "net.mullvad.core.model")]
 pub enum VoucherSubmissionResult {
     Ok(VoucherSubmission),
     Error(VoucherSubmissionError),
 }
 
 #[derive(IntoJava)]
-#[jnix(package = "net.mullvad.mullvadvpn.model")]
+#[jnix(package = "net.mullvad.core.model")]
 pub enum VoucherSubmissionError {
     InvalidVoucher,
     VoucherAlreadyUsed,

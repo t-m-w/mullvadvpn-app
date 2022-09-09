@@ -12,7 +12,7 @@ use talpid_types::net::{
 /// `mullvad_api::RelayListProxy`. This can also be passed to frontends.
 #[derive(Default, Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct RelayList {
     #[cfg_attr(target_os = "android", jnix(skip))]
     pub etag: Option<String>,
@@ -35,7 +35,7 @@ impl RelayList {
 /// A list of [`RelayListCity`]s within a country. Used by [`RelayList`].
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct RelayListCountry {
     pub name: String,
     pub code: CountryCode,
@@ -45,7 +45,7 @@ pub struct RelayListCountry {
 /// A list of [`Relay`]s within a city. Used by [`RelayListCountry`].
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct RelayListCity {
     pub name: String,
     pub code: CityCode,
@@ -60,7 +60,7 @@ pub struct RelayListCity {
 /// `mullvad_api::RelayListProxy`.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub struct Relay {
     pub hostname: String,
     #[cfg_attr(target_os = "android", jnix(skip))]
@@ -85,7 +85,7 @@ pub struct Relay {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 pub enum RelayEndpointData {
     Openvpn,
     Bridge,
@@ -117,7 +117,7 @@ pub struct OpenVpnEndpoint {
 /// Contains data about all WireGuard endpoints, such as valid port ranges.
 #[derive(Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[cfg_attr(target_os = "android", jnix(skip_all))]
 pub struct WireguardEndpointData {
     /// Port to connect to
@@ -142,7 +142,7 @@ impl Default for WireguardEndpointData {
 /// Contains data about specific WireGuard endpoints, i.e. their public keys.
 #[derive(Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Debug)]
 #[cfg_attr(target_os = "android", derive(IntoJava))]
-#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.mullvadvpn.model"))]
+#[cfg_attr(target_os = "android", jnix(package = "net.mullvad.core.model"))]
 #[cfg_attr(target_os = "android", jnix(skip_all))]
 pub struct WireguardRelayEndpointData {
     /// Public key used by the relay peer

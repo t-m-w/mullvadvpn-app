@@ -40,6 +40,7 @@ configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
 dependencies {
     implementation(Dependencies.AndroidX.coreKtx)
     implementation(Dependencies.AndroidX.lifecycleRuntimeKtx)
+    implementation(Dependencies.jodaTime)
     implementation(Dependencies.Kotlin.stdlib)
     implementation(Dependencies.KotlinX.coroutinesAndroid)
 }

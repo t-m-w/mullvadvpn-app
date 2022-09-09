@@ -210,8 +210,8 @@ impl<
                 };
                 tokio::spawn(future);
             }
-            RequestCommand::Reset => {
-                self.connector_handle.reset();
+            RequestCommand::Reset(completion_tx) => {
+                let _ = completion_tx.send(self.connector_handle.reset().await);
             }
             RequestCommand::NextApiConfig => {
                 if let Some(new_config) = self.proxy_config_provider.next().await {
@@ -221,7 +221,7 @@ impl<
                     };
                     // Switch to new connection mode unless rejected by address change callback
                     if (self.new_address_callback)(endpoint).await {
-                        self.connector_handle.set_connection_mode(new_config);
+                        self.connector_handle.set_connection_mode(new_config).await;
                     }
                 }
             }
@@ -232,7 +232,7 @@ impl<
         while let Some(command) = self.command_rx.next().await {
             self.process_command(command).await;
         }
-        self.connector_handle.reset();
+        let _ = self.connector_handle.reset().await;
     }
 }
 
@@ -244,8 +244,12 @@ pub struct RequestServiceHandle {
 
 impl RequestServiceHandle {
     /// Resets the corresponding RequestService, dropping all in-flight requests.
-    pub fn reset(&self) {
-        let _ = self.tx.unbounded_send(RequestCommand::Reset);
+    pub async fn reset(&self) -> Result<()> {
+        let (completion_tx, completion_rx) = oneshot::channel();
+        self.tx
+            .unbounded_send(RequestCommand::Reset(completion_tx))
+            .map_err(|_| Error::SendError)?;
+        completion_rx.await.map_err(|_| Error::ReceiveError)
     }
 
     /// Submits a `RestRequest` for exectuion to the request service.
@@ -271,7 +275,7 @@ pub(crate) enum RequestCommand {
         RestRequest,
         oneshot::Sender<std::result::Result<Response, Error>>,
     ),
-    Reset,
+    Reset(oneshot::Sender<()>),
     NextApiConfig,
 }
 

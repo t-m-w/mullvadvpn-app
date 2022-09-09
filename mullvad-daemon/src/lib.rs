@@ -909,7 +909,7 @@ where
         match (&self.tunnel_state, &tunnel_state_transition) {
             // only reset the API sockets if when connected or leaving the connected state
             (&TunnelState::Connected { .. }, _) | (_, &TunnelStateTransition::Connected(_)) => {
-                self.api_handle.service().reset();
+                self.api_handle.service().reset().await;
             }
             _ => (),
         };

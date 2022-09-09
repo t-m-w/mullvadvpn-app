@@ -45,19 +45,27 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 #[derive(Clone)]
 pub struct HttpsConnectorWithSniHandle {
     tx: mpsc::UnboundedSender<HttpsConnectorRequest>,
+    notify: Arc<tokio::sync::Notify>,
 }
 
 impl HttpsConnectorWithSniHandle {
     /// Stop all streams produced by this connector
-    pub fn reset(&self) {
+    pub async fn reset(&self) {
+        // Register for notification before sending the request
+        // FIXME: Make sure it actually works as intended with notify_waiters
+        let notified = self.notify.notified();
         let _ = self.tx.unbounded_send(HttpsConnectorRequest::Reset);
+        notified.await;
     }
 
     /// Change the proxy settings for the connector
-    pub fn set_connection_mode(&self, proxy: ApiConnectionMode) {
+    pub async fn set_connection_mode(&self, proxy: ApiConnectionMode) {
+        // Register for notification before sending the request
+        let notified = self.notify.notified();
         let _ = self
             .tx
             .unbounded_send(HttpsConnectorRequest::SetConnectionMode(proxy));
+        notified.await;
     }
 }
 
@@ -182,12 +190,12 @@ impl HttpsConnectorWithSni {
                 inner,
                 sni_hostname,
                 address_cache,
-                abort_notify,
+                abort_notify: abort_notify.clone(),
                 proxy_context: SsContext::new_shared(ServerType::Local),
                 #[cfg(target_os = "android")]
                 socket_bypass_tx,
             },
-            HttpsConnectorWithSniHandle { tx },
+            HttpsConnectorWithSniHandle { tx, notify: abort_notify },
         )
     }
 

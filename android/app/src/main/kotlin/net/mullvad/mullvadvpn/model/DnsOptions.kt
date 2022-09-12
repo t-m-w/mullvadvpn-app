@@ -5,4 +5,28 @@ import java.net.InetAddress
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class DnsOptions(val custom: Boolean, val addresses: ArrayList<InetAddress>) : Parcelable
+data class DnsOptions(
+    val state: DnsState,
+    val defaultDnsOptions: DefaultDnsOptions,
+    val customDnsOptions: CustomDnsOptions
+) : Parcelable
+
+@Parcelize
+enum class DnsState : Parcelable {
+    Default,
+    Custom
+}
+
+@Parcelize
+data class CustomDnsOptions(
+    val addresses: ArrayList<InetAddress>
+) : Parcelable
+
+@Parcelize
+data class DefaultDnsOptions(
+    val blockAds: Boolean = false,
+    val blockTrackers: Boolean = false,
+    val blockMalware: Boolean = false,
+    val blockAdultContent: Boolean = false,
+    val blockGambling: Boolean = false
+) : Parcelable

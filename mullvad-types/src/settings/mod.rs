@@ -204,9 +204,6 @@ pub struct TunnelOptions {
 
 pub use dns::{CustomDnsOptions, DefaultDnsOptions, DnsOptions, DnsState};
 
-#[cfg(target_os = "android")]
-pub use dns::AndroidDnsOptions;
-
 impl Default for TunnelOptions {
     fn default() -> Self {
         TunnelOptions {

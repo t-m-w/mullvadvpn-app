@@ -1,5 +1,5 @@
 #[cfg(target_os = "android")]
-use jnix::{jni::objects::JObject, FromJava, IntoJava, JnixEnv};
+use jnix::{FromJava, IntoJava};
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
 

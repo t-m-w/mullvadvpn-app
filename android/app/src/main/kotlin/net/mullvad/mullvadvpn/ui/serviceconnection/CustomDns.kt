@@ -15,7 +15,7 @@ class CustomDns(private val connection: Messenger, private val settingsListener:
             maybeDnsOptions?.let { dnsOptions ->
                 synchronized(this) {
                     onEnabledChanged.notifyIfChanged(dnsOptions.state == DnsState.Custom)
-                    onDnsServersChanged.notifyIfChanged(dnsOptions.customDnsOptions.addresses)
+                    onDnsServersChanged.notifyIfChanged(dnsOptions.customOptions.addresses)
                 }
             }
         }

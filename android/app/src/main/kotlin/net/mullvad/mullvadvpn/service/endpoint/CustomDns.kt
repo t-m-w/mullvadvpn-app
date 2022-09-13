@@ -34,7 +34,7 @@ class CustomDns(private val endpoint: ServiceEndpoint) {
             maybeDnsOptions?.let { dnsOptions ->
                 enabled = dnsOptions.state == DnsState.Custom
                 dnsServers.clear()
-                dnsServers.addAll(dnsOptions.customDnsOptions.addresses)
+                dnsServers.addAll(dnsOptions.customOptions.addresses)
             }
         }
 

@@ -51,7 +51,7 @@ nix = "0.23"
 
 
 [target.'cfg(target_os = "android")'.dependencies]
-jnix = { version = "0.4", features = ["derive"] }
+jnix = { git = "https://github.com/mullvad/jnix", rev = "522381e994d15453c756fe65eb6f203d9d639e2a", features = ["derive"] }
 
 
 [target.'cfg(target_os = "linux")'.dependencies]

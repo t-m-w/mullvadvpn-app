@@ -10,7 +10,7 @@
     <string name="foreground_notification_channel_description">Shows current VPN tunnel
     status</string>
     <string name="account_time_notification_channel_name">Account time reminders</string>
-    <string name="account_time_notification_channel_description">Shows reminders when the account
+    <string name="account_time_notification_channel_description">Shows reminders when the accoun
     time is about to expire</string>
     <string name="connecting_to_daemon">Connecting to Mullvad system service...</string>
     <string name="login_title">Login</string>
@@ -114,7 +114,7 @@
     troubleshoot or report the problem to us.</string>
     <string name="auth_failed">Account authentication failed.</string>
     <string name="ipv6_unavailable">Could not configure IPv6</string>
-    <string name="set_firewall_policy_error">Failed to apply firewall rules. The device might
+    <string name="set_firewall_policy_error">Failed to apply firewall rules. The device migh
     currently be unsecured</string>
     <string name="set_dns_error">Failed to set system DNS server</string>
     <string name="invalid_dns_servers">Custom DNS server addresses %1$s are invalid</string>
@@ -122,7 +122,7 @@
     <string name="vpn_permission_denied_error">VPN permission was denied when creating the tunnel.
     Please try connecting again.</string>
     <string name="no_matching_relay">No relay server matches the current settings</string>
-    <string name="no_matching_bridge_relay">No bridge relay server matches the current
+    <string name="no_matching_bridge_relay">No bridge relay server matches the curren
     settings</string>
     <string name="no_wireguard_key">Valid WireGuard key is missing. Manage keys under Advanced
     settings.</string>
@@ -182,14 +182,14 @@
     device.</string>
     <string name="max_devices_warning_title">Too many devices</string>
     <string name="max_devices_resolved_title">Super!</string>
-    <string name="max_devices_warning_description">You have too many active devices. Please log out
+    <string name="max_devices_warning_description">You have too many active devices. Please log ou
     of at least one by removing it from the list below. You can find the corresponding nickname
     under the device\'s Account settings.</string>
     <string name="max_devices_resolved_description">You can now continue logging in on this
     device.</string>
     <string name="max_devices_confirm_removal_description">
-<![CDATA[Are you sure you want to log out of <b>%s</b>?]]>
-    </string>
+        <![CDATA[Are you sure you want to log out of <b>%s</b>?]]>
+</string>
     <string name="confirm_removal">Yes, log out device</string>
     <string name="continue_login">Continue with login</string>
     <string name="failed_to_fetch_devices">Failed to fetch list of devices</string>

@@ -1,0 +1,202 @@
+<resources>
+    <string name="connecting">Connecting</string>
+    <string name="reconnecting">Reconnecting</string>
+    <string name="disconnecting">Disconnecting</string>
+    <string name="secured">Secured</string>
+    <string name="unsecured">Unsecured</string>
+    <string name="critical_error">Critical error (your attention is required)</string>
+    <string name="blocking_all_connections">Blocking all connections</string>
+    <string name="foreground_notification_channel_name">VPN tunnel status</string>
+    <string name="foreground_notification_channel_description">Shows current VPN tunnel
+    status</string>
+    <string name="account_time_notification_channel_name">Account time reminders</string>
+    <string name="account_time_notification_channel_description">Shows reminders when the account
+    time is about to expire</string>
+    <string name="connecting_to_daemon">Connecting to Mullvad system service...</string>
+    <string name="login_title">Login</string>
+    <string name="login_description">Enter your account number</string>
+    <string name="logging_in_title">Logging in...</string>
+    <string name="logging_in_description">Checking account number</string>
+    <string name="logged_in_title">Logged in</string>
+    <string name="logged_in_description">Valid account number</string>
+    <string name="login_fail_title">Login failed</string>
+    <string name="login_fail_description">Invalid account number</string>
+    <string name="dont_have_an_account">Don\'t have an account number?</string>
+    <string name="create_account">Create account</string>
+    <string name="creating_new_account">Creating account...</string>
+    <string name="failed_to_create_account">Failed to create account</string>
+    <string name="account_created">Account created</string>
+    <string name="congrats">Congrats!</string>
+    <string name="here_is_your_account_number">Here\'s your account number. Save it!</string>
+    <string name="pay_to_start_using">To start using the app, you first need to add time to your
+    account.</string>
+    <string name="buy_credit">Buy credit</string>
+    <string name="buy_more_credit">Buy more credit</string>
+    <string name="redeem_voucher">Redeem voucher</string>
+    <string name="enter_voucher_code">Enter voucher code</string>
+    <string name="redeem">Redeem</string>
+    <string name="invalid_voucher">Voucher code is invalid.</string>
+    <string name="voucher_already_used">Voucher code has already been used.</string>
+    <string name="error_occurred">An error occurred.</string>
+    <string name="settings">Settings</string>
+    <string name="settings_account">Account</string>
+    <string name="less_than_a_day_left">less than a day left</string>
+    <string name="less_than_a_minute_ago">less than a minute ago</string>
+    <string name="account_credit_expires_in_a_few_minutes">Account credit expires in a few
+    minutes</string>
+    <string name="account_credit_has_expired">You have no more VPN time left on this
+    account.</string>
+    <string name="out_of_time">Out of time</string>
+    <string name="add_time_to_account">Either buy credit on our website or redeem a
+    voucher.</string>
+    <string name="settings_preferences">Preferences</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="app_version">App version</string>
+    <string name="update_available_footer">Update available, download to remain safe.</string>
+    <string name="report_a_problem">Report a problem</string>
+    <string name="faqs_and_guides">FAQs &amp; Guides</string>
+    <string name="account_number">Account number</string>
+    <string name="device_name">Device name</string>
+    <string name="mullvad_account_number">Mullvad account number</string>
+    <string name="copied_mullvad_account_number">Copied Mullvad account number to
+    clipboard</string>
+    <string name="paid_until">Paid until</string>
+    <string name="log_out">Log out</string>
+    <string name="local_network_sharing">Local network sharing</string>
+    <string name="allow_lan_footer">Allows access to other devices on the same network for sharing,
+    printing etc.</string>
+    <string name="auto_connect">Auto-connect</string>
+    <string name="auto_connect_footer">Automatically connect to a server when the app
+    launches.</string>
+    <string name="wireguard_mtu">WireGuard MTU</string>
+    <string name="wireguard_mtu_footer">Set WireGuard MTU value. Valid range: %1$d - %2$d.</string>
+    <string name="hint_default">Default</string>
+    <string name="problem_report_description">To help you more effectively, your app\'s log file
+    will be attached to this message. Your data will remain secure and private, as it is anonymised
+    before being sent over an encrypted channel.</string>
+    <string name="user_email_hint">Your email (optional)</string>
+    <string name="user_message_hint">Please describe your problem in English or Swedish.</string>
+    <string name="view_logs">View app logs</string>
+    <string name="send">Send</string>
+    <string name="sending">Sending...</string>
+    <string name="sent">Sent</string>
+    <string name="failed_to_send">Failed to send</string>
+    <string name="confirm_no_email">You are about to send the problem report without a way for us
+    to get back to you. If you want an answer to your report you will have to enter an email
+    address.</string>
+    <string name="send_anyway">Send anyway</string>
+    <string name="back">Back</string>
+    <string name="sent_thanks">Thanks!</string>
+    <string name="we_will_look_into_this">We will look into this.</string>
+    <string name="sent_contact">If needed we will contact you at %1$s</string>
+    <string name="failed_to_send_details">If you exit the form and try again later, the information
+    you already entered will still be here.</string>
+    <string name="edit_message">Edit message</string>
+    <string name="try_again">Try again</string>
+    <string name="unsecured_connection">UNSECURED CONNECTION</string>
+    <string name="creating_secure_connection">CREATING SECURE CONNECTION</string>
+    <string name="secure_connection">SECURE CONNECTION</string>
+    <string name="blocked_connection">BLOCKED CONNECTION</string>
+    <string name="error_state">FAILED TO SECURE CONNECTION</string>
+    <string name="connect">Secure my connection</string>
+    <string name="cancel">Cancel</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="switch_location">Switch location</string>
+    <string name="wireguard">WireGuard</string>
+    <string name="tcp">TCP</string>
+    <string name="udp">UDP</string>
+    <string name="in_address">In</string>
+    <string name="out_address">Out</string>
+    <string name="blocking_internet">Blocking internet</string>
+    <string name="not_blocking_internet">YOU MIGHT BE LEAKING NETWORK TRAFFIC</string>
+    <string name="failed_to_block_internet">Failed to block all network traffic. Please
+    troubleshoot or report the problem to us.</string>
+    <string name="auth_failed">Account authentication failed.</string>
+    <string name="ipv6_unavailable">Could not configure IPv6</string>
+    <string name="set_firewall_policy_error">Failed to apply firewall rules. The device might
+    currently be unsecured</string>
+    <string name="set_dns_error">Failed to set system DNS server</string>
+    <string name="invalid_dns_servers">Custom DNS server addresses %1$s are invalid</string>
+    <string name="start_tunnel_error">Failed to start tunnel connection</string>
+    <string name="vpn_permission_denied_error">VPN permission was denied when creating the tunnel.
+    Please try connecting again.</string>
+    <string name="no_matching_relay">No relay server matches the current settings</string>
+    <string name="no_matching_bridge_relay">No bridge relay server matches the current
+    settings</string>
+    <string name="no_wireguard_key">Valid WireGuard key is missing. Manage keys under Advanced
+    settings.</string>
+    <string name="custom_tunnel_host_resolution_error">Failed to resolve the hostname of custom
+    server</string>
+    <string name="is_offline">This device is offline, no tunnels can be established</string>
+    <string name="virtual_adapter_problem">Virtual adapter error</string>
+    <string name="wireguard_error">WireGuard error</string>
+    <string name="too_many_keys">Too many WireGuard keys registered to account</string>
+    <string name="failed_to_generate_key">Failed to generate a key</string>
+    <string name="update_available">UPDATE AVAILABLE</string>
+    <string name="update_available_description">Install Mullvad VPN (%1$s) to stay up to
+    date</string>
+    <string name="unsupported_version">UNSUPPORTED VERSION</string>
+    <string name="unsupported_version_description">You are running an unsupported app version.
+    Please upgrade to %1$s now to ensure your security</string>
+    <string name="unsupported_version_without_upgrade">You are running an unsupported app
+    version.</string>
+    <string name="account_credit_expires_soon">Account credit expires soon</string>
+    <string name="select_location">Select location</string>
+    <string name="select_location_description">While connected, your real location is masked with a
+    private and secure location in the selected region.</string>
+    <string name="wireguard_key">WireGuard key</string>
+    <string name="public_key">Public key</string>
+    <string name="wireguard_key_generated">Key generated</string>
+    <string name="wireguard_verify_key">Verify key</string>
+    <string name="wireguard_generate_key">Generate key</string>
+    <string name="wireguard_replace_key">Regenerate key</string>
+    <string name="wireguard_manage_keys">Manage keys</string>
+    <string name="wireguard_key_reconnecting">Reconnecting with new WireGuard key...</string>
+    <string name="wireguard_key_valid">Key is valid</string>
+    <string name="wireguard_key_invalid">Key is invalid</string>
+    <string name="wireguard_key_verification_failure">Key verification failed</string>
+    <string name="wireguard_public_key">WireGuard public key</string>
+    <string name="copied_wireguard_public_key">Copied WireGuard public key to clipboard</string>
+    <string name="split_tunneling">Split tunneling</string>
+    <string name="split_tunneling_description">Split tunneling makes it possible to select which
+    applications should not be routed through the VPN tunnel.</string>
+    <string name="enable">Enable</string>
+    <string name="enable_custom_dns">Use custom DNS server</string>
+    <string name="add_a_server">Add a server</string>
+    <string name="custom_dns_hint">Enter IP</string>
+    <string name="custom_dns_footer">Enable to add at least one DNS server.</string>
+    <string name="confirm_local_dns">The local DNS server will not work unless you enable \"Local
+    Network Sharing\" under Preferences.</string>
+    <string name="add_anyway">Add anyway</string>
+    <string name="exclude_applications">Excluded applications</string>
+    <string name="all_applications">All applications</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="show_system_apps">Show system apps</string>
+    <string name="toggle_vpn">Toggle VPN</string>
+    <string name="go_to_login">Go to login</string>
+    <string name="device_inactive_title">Device is inactive</string>
+    <string name="device_inactive_description">You have removed this device. To connect again, you
+    will need to log back in.</string>
+    <string name="device_inactive_unblock_warning">Going to login will unblock the internet on this
+    device.</string>
+    <string name="max_devices_warning_title">Too many devices</string>
+    <string name="max_devices_resolved_title">Super!</string>
+    <string name="max_devices_warning_description">You have too many active devices. Please log out
+    of at least one by removing it from the list below. You can find the corresponding nickname
+    under the device\'s Account settings.</string>
+    <string name="max_devices_resolved_description">You can now continue logging in on this
+    device.</string>
+    <string name="max_devices_confirm_removal_description">
+        <![CDATA[Are you sure you want to log out of <b>%s</b>?]]>
+</string>
+    <string name="confirm_removal">Yes, log out device</string>
+    <string name="continue_login">Continue with login</string>
+    <string name="failed_to_fetch_devices">Failed to fetch list of devices</string>
+    <string name="port_removal_notice">This will delete all forwarded ports. Local settings will be
+    saved.</string>
+    <string name="copy_account_number">Copy account number</string>
+    <string name="hide_account_number">Hide account number</string>
+    <string name="show_account_number">Show account number</string>
+    <string name="failed_to_remove_device">Failed to remove device</string>
+</resources>

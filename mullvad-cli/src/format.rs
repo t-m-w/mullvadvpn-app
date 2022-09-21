@@ -1,14 +1,13 @@
 use mullvad_management_interface::types::{
     error_state::{
-        firewall_policy_error::ErrorType as FirewallPolicyErrorType, Cause as ErrorStateCause,
-        FirewallPolicyError, GenerationError,
+        firewall_policy_error::ErrorType as FirewallPolicyErrorType, AuthFailedError,
+        Cause as ErrorStateCause, FirewallPolicyError, GenerationError,
     },
     tunnel_state,
     tunnel_state::State::*,
     ErrorState, ObfuscationType, ProxyType, TransportProtocol, TunnelState, TunnelStateRelayInfo,
     TunnelType,
 };
-use mullvad_types::auth_failed::AuthFailed;
 use std::borrow::Cow;
 
 pub fn print_state(state: &TunnelState, verbose: bool) {
@@ -168,7 +167,7 @@ fn print_error_state(error_state: &ErrorState) {
         Some(ErrorStateCause::AuthFailed) => {
             println!(
                 "Blocked: {}",
-                AuthFailed::from(error_state.auth_fail_reason.as_ref())
+                auth_failed_error_to_string(error_state.auth_failed_error),
             );
         }
         #[cfg(target_os = "linux")]
@@ -186,14 +185,10 @@ fn error_state_to_string(error_state: &ErrorState) -> String {
     let error_str = match ErrorStateCause::from_i32(error_state.cause).expect("unknown error cause")
     {
         AuthFailed => {
-            return if error_state.auth_fail_reason.is_empty() {
-                "Authentication with remote server failed".to_string()
-            } else {
-                format!(
-                    "Authentication with remote server failed: {}",
-                    error_state.auth_fail_reason
-                )
-            };
+            return format!(
+                "Authentication with remote server failed: {}",
+                auth_failed_error_to_string(error_state.auth_failed_error)
+            );
         }
         Ipv6Unavailable => "Failed to configure IPv6 because it's disabled in the platform",
         SetFirewallPolicyError => {
@@ -241,6 +236,20 @@ fn policy_error_to_string(policy_error: &FirewallPolicyError) -> String {
         ),
     };
     format!("Failed to set firewall policy: {}", cause)
+}
+
+fn auth_failed_error_to_string(auth_failed_error: i32) -> &'static str {
+    const INVALID_ACCOUNT_MSG: &str = "You've logged in with an account number that is not valid. Please log out and try another one.";
+    const EXPIRED_ACCOUNT_MSG: &str = "You have no more VPN time left on this account. Please log in on our website to buy more credit.";
+    const TOO_MANY_CONNECTIONS_MSG: &str = "This account has too many simultaneous connections. Disconnect another device or try connecting again shortly.";
+    const UNKNOWN_MSG: &str = "Unknown error.";
+
+    match AuthFailedError::from_i32(auth_failed_error).expect("invalid auth failed error") {
+        AuthFailedError::InvalidAccount => INVALID_ACCOUNT_MSG,
+        AuthFailedError::ExpiredAccount => EXPIRED_ACCOUNT_MSG,
+        AuthFailedError::TooManyConnections => TOO_MANY_CONNECTIONS_MSG,
+        AuthFailedError::Unknown => UNKNOWN_MSG,
+    }
 }
 
 fn format_protocol(protocol: TransportProtocol) -> &'static str {

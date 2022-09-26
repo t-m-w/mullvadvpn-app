@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { hasExpired } from '../../shared/account-expiry';
-import { AuthFailureKind, parseAuthFailure } from '../../shared/auth-failure';
+import { AuthFailedError, ErrorStateCause } from '../../shared/daemon-rpc-types';
 import NotificationArea from '../components/NotificationArea';
 import { LoginState } from '../redux/account/reducers';
 import { IConnectionReduxState } from '../redux/connection/reducers';
@@ -108,8 +108,8 @@ export default class Connect extends React.Component<IProps, IState> {
     // Blocked with auth failure / expired account
     if (
       tunnelState.state === 'error' &&
-      tunnelState.details.cause.reason === 'auth_failed' &&
-      parseAuthFailure(tunnelState.details.cause.reason).kind === AuthFailureKind.expiredAccount
+      tunnelState.details.cause === ErrorStateCause.authFailed &&
+      tunnelState.details.authFailedError === AuthFailedError.expiredAccount
     ) {
       return true;
     }
@@ -183,7 +183,7 @@ export default class Connect extends React.Component<IProps, IState> {
       case 'connected':
         return MarkerStyle.secure;
       case 'error':
-        return !status.details.blockFailure ? MarkerStyle.secure : MarkerStyle.unsecure;
+        return !status.details.blockingError ? MarkerStyle.secure : MarkerStyle.unsecure;
       case 'disconnected':
         return MarkerStyle.unsecure;
       case 'disconnecting':

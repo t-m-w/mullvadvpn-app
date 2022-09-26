@@ -767,7 +767,7 @@ export default class AppRenderer {
         break;
 
       case 'error':
-        actions.updateBlockState(!tunnelState.details.blockFailure);
+        actions.updateBlockState(!tunnelState.details.blockingError);
         break;
     }
   }

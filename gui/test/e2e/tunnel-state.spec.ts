@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { Page } from 'playwright';
 
 import { colors } from '../../src/config.json';
-import { ILocation, ITunnelEndpoint, TunnelState } from '../../src/shared/daemon-rpc-types';
+import { ErrorStateCause, ILocation, ITunnelEndpoint, TunnelState } from '../../src/shared/daemon-rpc-types';
 import {
   getBackgroundColor,
   getColor,
@@ -165,7 +165,7 @@ test('App should show error tunnel state', async () => {
 
   await sendMockIpcResponse<TunnelState>({
     channel: 'tunnel-',
-    response: { state: 'error', details: { cause: { reason: 'is_offline' } } },
+    response: { state: 'error', details: { cause: ErrorStateCause.isOffline } },
   });
 
   const statusLabel = getLabel();

@@ -16,9 +16,9 @@ test.afterAll(async () => {
 });
 
 test('Settings Page', async () => {
-  const title = await appWindow.locator('h1');
+  const title = appWindow.locator('h1');
   await expect(title).toContainText('Settings');
 
-  const closeButton = await appWindow.locator('button[aria-label="Close"]');
+  const closeButton = appWindow.locator('button[aria-label="Close"]');
   await expect(closeButton).toBeVisible();
 });

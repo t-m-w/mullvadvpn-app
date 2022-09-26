@@ -77,7 +77,7 @@ Line wrap the file at 100 chars.                                              Th
 - When the system process is being shut down and the target state is _secured_, maintain the
   blocking firewall rules unless it's possible to deduce that the system isn't shutting down and the
   system service is being stopped by the user intentionally. This is to prevent leaks that might
-  occur during system shutdown.
+  occur during system shutdown. This is a fix for MUL-002.
 
 #### Linux
 - Added traffic blocking during early boot, before the daemon starts, to prevent leaks in the case

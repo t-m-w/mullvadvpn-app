@@ -1,5 +1,6 @@
 package net.mullvad.mullvadvpn.ui
 
+
 import android.app.Activity
 import android.app.UiModeManager
 import android.content.Intent
@@ -9,6 +10,9 @@ import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -16,26 +20,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import net.mullvad.mullvadvpn.BuildConfig
 import net.mullvad.mullvadvpn.R
+import net.mullvad.mullvadvpn.compose.component.ScaffoldWithTopBar
+import net.mullvad.mullvadvpn.compose.screen.ChangesListScreen
 import net.mullvad.mullvadvpn.dataproxy.MullvadProblemReport
 import net.mullvad.mullvadvpn.di.uiModule
 import net.mullvad.mullvadvpn.model.AccountExpiry
 import net.mullvad.mullvadvpn.model.DeviceState
-import net.mullvad.mullvadvpn.ui.fragments.AppChangesFragment
 import net.mullvad.mullvadvpn.ui.fragments.DeviceRevokedFragment
 import net.mullvad.mullvadvpn.ui.serviceconnection.AccountRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.ServiceConnectionManager
 import net.mullvad.mullvadvpn.util.UNKNOWN_STATE_DEBOUNCE_DELAY_MILLISECONDS
 import net.mullvad.mullvadvpn.util.addDebounceForUnknownState
+import net.mullvad.mullvadvpn.viewmodel.AppChangesViewModel
 import org.koin.android.ext.android.getKoin
 import org.koin.core.context.loadKoinModules
 
@@ -55,14 +57,15 @@ open class MainActivity : FragmentActivity() {
     private lateinit var accountRepository: AccountRepository
     private lateinit var deviceRepository: DeviceRepository
     private lateinit var serviceConnectionManager: ServiceConnectionManager
+    private lateinit var changesViewModel: AppChangesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loadKoinModules(uiModule)
-
         getKoin().apply {
             accountRepository = get()
             deviceRepository = get()
             serviceConnectionManager = get()
+            changesViewModel = get()
         }
 
         requestedOrientation = if (deviceIsTv) {
@@ -175,7 +178,36 @@ open class MainActivity : FragmentActivity() {
                         }
                         currentState = newState
                     }
+                    if (currentState is DeviceState.LoggedOut ||
+                        currentState is DeviceState.LoggedIn
+                    ) {
+                        checkAndShowChanges()
+                    }
                 }
+        }
+    }
+
+    private fun checkAndShowChanges() {
+        if (changesViewModel.shouldShowChanges() || true) {
+            findViewById<ComposeView>(R.id.compose_view).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+                setContent {
+                    ScaffoldWithTopBar(
+                        topBarColor = colorResource(id = android.R.color.transparent),
+                        statusBarColor = colorResource(id = android.R.color.transparent),
+                        navigationBarColor = colorResource(id = android.R.color.transparent),
+                        onSettingsClicked = {},
+                        content = {
+                            ChangesListScreen(
+                                context = context,
+                                viewModel = changesViewModel,
+                                serviceConnectionManager = serviceConnectionManager,
+                                onBackPressed = {}
+                            )
+                        }
+                    )
+                }
+            }
         }
     }
 

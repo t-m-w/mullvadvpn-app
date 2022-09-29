@@ -1,5 +1,7 @@
 package net.mullvad.mullvadvpn.compose.component
 
+
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -11,20 +13,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import net.mullvad.mullvadvpn.BuildConfig
 import net.mullvad.mullvadvpn.R
-import net.mullvad.mullvadvpn.util.capitalizeFirstCharOfEachWord
+import net.mullvad.mullvadvpn.ui.serviceconnection.ServiceConnectionManager
+import net.mullvad.mullvadvpn.ui.serviceconnection.appVersionInfoCache
 import net.mullvad.mullvadvpn.util.toBulletList
 import net.mullvad.mullvadvpn.viewmodel.AppChangesViewModel
 
-
 @Composable
-fun ShowAppChangesDialog(viewModel: AppChangesViewModel) {
+fun ShowChangesDialog(
+    context: Context,
+    changesViewModel: AppChangesViewModel,
+    serviceConnectionManager: ServiceConnectionManager,
+    onBackPressed: () -> Unit
+) {
+    var version: String? = serviceConnectionManager.appVersionInfoCache()?.version
+    if (version.isNullOrEmpty()) version = BuildConfig.VERSION_NAME
+    var changesHeader =
+        "<h4>${context.getString(net.mullvad.mullvadvpn.R.string.changesHeader)}</h4>\n"
     AlertDialog(
         onDismissRequest = {
-            viewModel.setDialogShowed()
+            changesViewModel.setDialogShowed()
         },
         title = {
             Column(
@@ -34,14 +47,18 @@ fun ShowAppChangesDialog(viewModel: AppChangesViewModel) {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(id = R.string.changes),
-                    fontSize = 18.sp
+                    text = version,
+                    color = colorResource(id = R.color.white),
+                    fontSize = 30.sp,
+                    fontStyle = FontStyle.Normal
                 )
             }
         },
+
         text = {
             HtmlText(
-                htmlFormattedString = viewModel.getChangesList().toBulletList(),
+                htmlFormattedString = changesHeader +
+                        changesViewModel.getChangesList().toBulletList(),
                 textSize = 14.sp.value
             )
         },
@@ -62,17 +79,21 @@ fun ShowAppChangesDialog(viewModel: AppChangesViewModel) {
                         contentColor = Color.White
                     ),
                     onClick = {
-
+                        onBackPressed()
                     }
                 ) {
                     Text(
-                        text = stringResource(id = R.string.confirm_removal),
+                        text = context.getString(R.string.gotIt),
                         fontSize = 18.sp
                     )
                 }
 
             }
         },
+        properties = DialogProperties(
+            dismissOnClickOutside = true,
+            dismissOnBackPress = true,
+        ),
         backgroundColor = colorResource(id = R.color.darkBlue)
     )
 }

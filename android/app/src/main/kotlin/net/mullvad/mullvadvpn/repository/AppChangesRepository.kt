@@ -6,8 +6,8 @@ import net.mullvad.mullvadvpn.BuildConfig
 import java.io.IOException
 import java.io.InputStream
 
-private const val SHOWN_CHANGES_LEY = BuildConfig.VERSION_NAME
-private const val CHANGES_FILE = "changes.txt"
+private const val SHOWN_CHANGES_KEY = BuildConfig.VERSION_NAME
+private const val CHANGES_FILE = "en-US/default.txt"
 
 interface IAppChangesRepository{
     fun shouldShowLastChanges(): Boolean
@@ -22,11 +22,11 @@ class AppChangesRepository(
 
 
     override fun shouldShowLastChanges(): Boolean {
-        return preferences.getBoolean(SHOWN_CHANGES_LEY, false)
+        return !preferences.getBoolean(SHOWN_CHANGES_KEY, false)
     }
 
     override fun setShowedLastChanges() {
-        preferences.edit().putBoolean(SHOWN_CHANGES_LEY, true).apply()
+        preferences.edit().putBoolean(SHOWN_CHANGES_KEY, true).apply()
     }
 
     override fun getLastVersionChanges(): List<String> {
@@ -37,7 +37,7 @@ class AppChangesRepository(
             inputStream.read(buffer)
             String(buffer).split('\n')
                 .filter { !it.isNullOrEmpty() }
-                .map { "- $it" }
+                .map { "$it" }
         } catch (e: IOException) {
             e.printStackTrace()
             ArrayList()

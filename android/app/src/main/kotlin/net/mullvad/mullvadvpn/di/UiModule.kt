@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import net.mullvad.mullvadvpn.applist.ApplicationsIconManager
 import net.mullvad.mullvadvpn.applist.ApplicationsProvider
 import net.mullvad.mullvadvpn.ipc.EventDispatcher
-import net.mullvad.mullvadvpn.repository.AppChangesMockRepository
 import net.mullvad.mullvadvpn.repository.AppChangesRepository
 import net.mullvad.mullvadvpn.repository.IAppChangesRepository
 import net.mullvad.mullvadvpn.ui.notification.AccountExpiryNotification
@@ -19,6 +18,7 @@ import net.mullvad.mullvadvpn.ui.serviceconnection.DeviceRepository
 import net.mullvad.mullvadvpn.ui.serviceconnection.ServiceConnectionManager
 import net.mullvad.mullvadvpn.ui.serviceconnection.SplitTunneling
 import net.mullvad.mullvadvpn.viewmodel.*
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -26,6 +26,10 @@ import org.koin.dsl.module
 import org.koin.dsl.onClose
 
 val uiModule = module {
+
+    single {
+        providePreferences(androidApplication())
+    }
 
     single<PackageManager> { androidContext().packageManager }
     single<String>(named(SELF_PACKAGE_NAME)) { androidContext().packageName }
@@ -44,6 +48,7 @@ val uiModule = module {
 
     single { ServiceConnectionManager(androidContext()) }
     single { androidContext().resources }
+    single { androidContext().assets }
 
     single { AccountExpiryNotification(get()) }
     single { TunnelStateNotification(get()) }
@@ -51,8 +56,10 @@ val uiModule = module {
 
     single { AccountRepository(get()) }
     single { DeviceRepository(get()) }
-//    single<IAppChangesRepository> { AppChangesRepository(providePreferences(androidContext()), androidContext().assets) }
-    single<IAppChangesRepository> { AppChangesMockRepository() }
+    single<IAppChangesRepository> {
+        AppChangesRepository(get(), get())
+    }
+//    single<IAppChangesRepository> { AppChangesMockRepository() }
 
     // View models
     viewModel { ConnectViewModel() }

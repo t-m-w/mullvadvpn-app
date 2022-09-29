@@ -4,7 +4,7 @@ fun List<String>.toBulletList(): String  {
     var sb = StringBuilder()
     sb.append("<ul>")
     this.forEach {
-        sb.append("<li><h4>&nbsp; $it</h4></li>\n<li></li>\n")
+        sb.append("<p>&nbsp;</p>\n<li><h6>&nbsp; $it</h6></li>\n")
     }
     sb.append("</ul>")
     return sb.toString()

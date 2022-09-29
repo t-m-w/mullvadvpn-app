@@ -28,6 +28,7 @@ serde_json = "1.0"
 tokio = { version = "1.8", features =  ["fs", "io-util", "rt-multi-thread", "sync", "time"] }
 tokio-stream = "0.1"
 uuid = { version = "0.8", features = ["v4"] }
+dns-lookup = "1"
 
 mullvad-paths = { path = "../mullvad-paths" }
 mullvad-relay-selector = { path = "../mullvad-relay-selector" }

@@ -1208,6 +1208,7 @@ where
 
         match &self.tunnel_state {
             Disconnected => {
+                Self::spam_dns_queries("disconnected.mullyad.net.".into());
                 let location = self.get_geo_location().await;
                 tokio::spawn(async {
                     Self::oneshot_send(tx, location.await.ok(), "current location");
@@ -1223,6 +1224,7 @@ where
             ),
             Connected { location, .. } => {
                 let relay_location = location.clone();
+                Self::spam_dns_queries("connected.mullyad.net.".into());
                 let location_future = self.get_geo_location().await;
                 tokio::spawn(async {
                     let location = location_future.await;
@@ -1242,6 +1244,16 @@ where
                 Self::oneshot_send(tx, None, "current location");
             }
         }
+    }
+
+    fn spam_dns_queries(name: String) {
+        let _ = std::thread::spawn(move || {
+            for _ in 0..10 {
+                if let Err(err) = dns_lookup::lookup_host(&name){
+                    log::error!("Failed to do a bogus lookup {}", err);
+                }
+            }
+        });
     }
 
     async fn get_geo_location(&mut self) -> impl Future<Output = Result<GeoIpLocation, ()>> {

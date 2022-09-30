@@ -552,6 +552,7 @@ pub struct Daemon<L: EventListener> {
     tunnel_state_machine_handle: TunnelStateMachineHandle,
     #[cfg(target_os = "windows")]
     volume_update_tx: mpsc::UnboundedSender<()>,
+    fake_expiry_date: chrono::DateTime<chrono::Utc>,
 }
 
 impl<L> Daemon<L>
@@ -750,6 +751,8 @@ where
             app_version_info,
             shutdown_tasks: vec![],
             tunnel_state_machine_handle,
+            fake_expiry_date: chrono::offset::Utc::now()
+                + chrono::Duration::from_std(std::time::Duration::from_secs(3 * 60)).unwrap(),
             #[cfg(target_os = "windows")]
             volume_update_tx,
         };
@@ -1292,11 +1295,14 @@ where
         account_token: AccountToken,
     ) {
         let account = self.account_manager.account_service.clone();
+        let fake_expiry_date = self.fake_expiry_date.clone();
         tokio::spawn(async move {
             let result = account.check_expiry(account_token).await;
             Self::oneshot_send(
                 tx,
-                result.map(|expiry| AccountData { expiry }),
+                result.map(|_expiry| AccountData {
+                    expiry: fake_expiry_date,
+                }),
                 "account data",
             );
         });
@@ -1330,6 +1336,9 @@ where
         voucher: String,
     ) {
         let manager = self.account_manager.clone();
+        self.fake_expiry_date = chrono::offset::Utc::now()
+            + chrono::Duration::from_std(std::time::Duration::from_secs(3 * 60)).unwrap();
+
         tokio::spawn(async move {
             Self::oneshot_send(
                 tx,

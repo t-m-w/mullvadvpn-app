@@ -400,6 +400,7 @@ pub(crate) struct AccountManager {
     expiry_requests: Vec<ResponseTx<DateTime<Utc>>>,
     rotation_requests: Vec<ResponseTx<()>>,
     data_requests: Vec<ResponseTx<PrivateDeviceState>>,
+    fake_expiry_date: DateTime<Utc>,
 }
 
 impl AccountManager {
@@ -432,6 +433,8 @@ impl AccountManager {
             expiry_requests: vec![],
             rotation_requests: vec![],
             data_requests: vec![],
+            fake_expiry_date: chrono::offset::Utc::now()
+                + chrono::Duration::from_std(std::time::Duration::from_secs(3 * 60)).unwrap(),
         };
 
         tokio::spawn(manager.run(cmd_rx));
@@ -580,7 +583,7 @@ impl AccountManager {
         let create_submission = move || {
             let old_config = self.data.device().ok_or(Error::NoDevice)?;
             let account_token = old_config.account_token.clone();
-            let account_service = self.account_service.clone();
+            let mut account_service = self.account_service.clone();
             Ok(async move { account_service.submit_voucher(account_token, voucher).await })
         };
 
@@ -653,9 +656,13 @@ impl AccountManager {
         tx: ResponseTx<VoucherSubmission>,
     ) {
         match &response {
-            Ok(submission) => {
+            Ok(_submission) => {
                 // Send expiry update event
-                let event = AccountEvent::Expiry(submission.new_expiry);
+                self.fake_expiry_date = chrono::offset::Utc::now()
+                    + chrono::Duration::from_std(std::time::Duration::from_secs(3 * 60)).unwrap();
+                // let event = AccountEvent::Expiry(submission.new_expiry);
+                let event = AccountEvent::Expiry(self.fake_expiry_date);
+
                 self.listeners
                     .retain(|listener| listener.send(event.clone()).is_ok());
             }
@@ -684,7 +691,8 @@ impl AccountManager {
                 self.listeners
                     .retain(|listener| listener.send(event.clone()).is_ok());
 
-                Self::drain_requests(&mut self.expiry_requests, || Ok(expiry));
+                let fake_expiry = self.fake_expiry_date.clone();
+                Self::drain_requests(&mut self.expiry_requests, || Ok(fake_expiry));
             }
             Err(Error::InvalidAccount) => {
                 self.revoke_device(|| Error::InvalidAccount).await;

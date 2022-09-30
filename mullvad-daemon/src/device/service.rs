@@ -315,7 +315,7 @@ impl AccountService {
     }
 
     pub async fn submit_voucher(
-        &self,
+        &mut self,
         account_token: AccountToken,
         voucher: String,
     ) -> Result<VoucherSubmission, Error> {

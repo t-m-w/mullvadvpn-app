@@ -426,7 +426,7 @@ impl ManagementService for ManagementServiceImpl {
                     }),
                 })
             })
-            .map_err(|error: RestError| {
+            .map_err(|error| {
                 log::error!(
                     "Unable to get account data from API: {}",
                     error.display_chain()

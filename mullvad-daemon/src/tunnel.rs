@@ -1,10 +1,19 @@
-use std::{future::Future, pin::Pin, sync::Arc};
+use std::{
+    future::Future,
+    net::{IpAddr, Ipv4Addr},
+    pin::Pin,
+    sync::Arc,
+};
 
 use tokio::sync::Mutex;
 
 use mullvad_relay_selector::{RelaySelector, SelectedBridge, SelectedObfuscator, SelectedRelay};
 use mullvad_types::{
-    endpoint::MullvadEndpoint, location::GeoIpLocation, relay_list::Relay, settings::TunnelOptions,
+    endpoint::MullvadEndpoint,
+    location::GeoIpLocation,
+    relay_list::{Relay, RelayEndpointData, WireguardRelayEndpointData},
+    settings::TunnelOptions,
+    ConnectionConfig,
 };
 use talpid_core::tunnel_state_machine::TunnelParametersGenerator;
 use talpid_types::{
@@ -82,7 +91,7 @@ impl ParametersGenerator {
             |relay: &Option<Relay>| relay.as_ref().map(|relay| relay.hostname.clone());
 
         match relays {
-            LastSelectedRelays::WireGuard {
+            LastSelectedRelays::Wireguard {
                 wg_entry: entry,
                 wg_exit: exit,
                 obfuscator,
@@ -91,15 +100,15 @@ impl ParametersGenerator {
                 hostname = exit.hostname.clone();
                 obfuscator_hostname = take_hostname(obfuscator);
                 bridge_hostname = None;
-                location = exit.location.as_ref().cloned().unwrap();
+                location = exit.location.as_ref().cloned()?;
             }
             #[cfg(not(target_os = "android"))]
-            LastSelectedRelays::OpenVpn { relay, bridge } => {
+            LastSelectedRelays::Openvpn { relay, bridge } => {
                 hostname = relay.hostname.clone();
                 bridge_hostname = take_hostname(bridge);
                 entry_hostname = None;
                 obfuscator_hostname = None;
-                location = relay.location.as_ref().cloned().unwrap();
+                location = relay.location.as_ref().cloned()?;
             }
         };
 
@@ -124,13 +133,39 @@ impl InnerParametersGenerator {
         let _data = self.device().await?;
         match self.relay_selector.get_relay(retry_attempt) {
             Ok((SelectedRelay::Custom(custom_relay), _bridge, _obfsucator)) => {
-                custom_relay
+                // self.last_generated_relays = None;
+                let parameters = custom_relay
                     // TODO: generate proxy settings for custom tunnels
                     .to_tunnel_parameters(self.tunnel_options.clone(), None)
                     .map_err(|e| {
                         log::error!("Failed to resolve hostname for custom tunnel config: {}", e);
                         Error::ResolveCustomHostname
-                    })
+                    });
+                match &parameters {
+                    Ok(_params) => {
+                        // assign stuff to last_generated_relays properly
+                        match custom_relay.config {
+                            ConnectionConfig::Wireguard(config) => {
+                                self.last_generated_relays =
+                                    Some(LastSelectedRelays::from_custom_wg_relay(
+                                        config,
+                                        custom_relay.host,
+                                    ))
+                            }
+                            ConnectionConfig::OpenVpn(config) => {
+                                self.last_generated_relays =
+                                    Some(LastSelectedRelays::from_custom_openvpn_relay(
+                                        config,
+                                        custom_relay.host,
+                                    ))
+                            }
+                        }
+                    }
+                    Err(_err) => {
+                        self.last_generated_relays = None;
+                    }
+                }
+                parameters
             }
             Ok((SelectedRelay::Normal(constraints), bridge, obfuscator)) => {
                 self.create_tunnel_parameters(
@@ -168,7 +203,7 @@ impl InnerParametersGenerator {
                     None => (None, None),
                 };
 
-                self.last_generated_relays = Some(LastSelectedRelays::OpenVpn {
+                self.last_generated_relays = Some(LastSelectedRelays::Openvpn {
                     relay: relay.clone(),
                     bridge: bridge_relay,
                 });
@@ -203,7 +238,7 @@ impl InnerParametersGenerator {
                     None => (None, None),
                 };
 
-                self.last_generated_relays = Some(LastSelectedRelays::WireGuard {
+                self.last_generated_relays = Some(LastSelectedRelays::Wireguard {
                     wg_entry: entry_relay.clone(),
                     wg_exit: relay.clone(),
                     obfuscator: obfuscator_relay,
@@ -272,7 +307,7 @@ enum LastSelectedRelays {
     ///     client -> obfuscator -> entry -> exit -> internet
     /// But for most users, it will look like this:
     ///     client -> entry -> internet
-    WireGuard {
+    Wireguard {
         wg_entry: Option<Relay>,
         wg_exit: Relay,
         obfuscator: Option<Relay>,
@@ -281,5 +316,93 @@ enum LastSelectedRelays {
     /// The traffic flows like this:
     ///     client -> bridge -> relay -> internet
     #[cfg(not(target_os = "android"))]
-    OpenVpn { relay: Relay, bridge: Option<Relay> },
+    Openvpn { relay: Relay, bridge: Option<Relay> },
+}
+
+impl LastSelectedRelays {
+    fn from_custom_wg_relay(config: wireguard::ConnectionConfig, host: String) -> Self {
+        let maybe_hostname = || {
+            if !host.is_empty() {
+                Some(host.clone())
+            } else {
+                None
+            }
+        };
+
+        let (wg_entry, wg_exit) = match &config.exit_peer {
+            Some(exit_peer) => {
+                let wg_exit = custom_relay(
+                    maybe_hostname().unwrap_or(exit_peer.endpoint.ip().to_string()),
+                    exit_peer.endpoint.ip(),
+                    wg_endpoint_data(exit_peer.public_key.clone()),
+                );
+                let wg_entry = custom_relay(
+                    config.peer.endpoint.ip().to_string(),
+                    config.peer.endpoint.ip(),
+                    wg_endpoint_data(config.peer.public_key.clone()),
+                );
+
+                (Some(wg_entry), wg_exit)
+            }
+            None => {
+                let wg_exit = custom_relay(
+                    maybe_hostname().unwrap_or(config.peer.endpoint.ip().to_string()),
+                    config.peer.endpoint.ip(),
+                    wg_endpoint_data(config.peer.public_key),
+                );
+                (None, wg_exit)
+            }
+        };
+
+        LastSelectedRelays::Wireguard {
+            wg_entry,
+            wg_exit,
+            obfuscator: None,
+        }
+    }
+
+    fn from_custom_openvpn_relay(config: openvpn::ConnectionConfig, host: String) -> Self {
+        let maybe_hostname = || {
+            if !host.is_empty() {
+                Some(host.clone())
+            } else {
+                None
+            }
+        };
+
+        let relay = custom_relay(
+            maybe_hostname().unwrap_or(config.endpoint.address.ip().to_string()),
+            config.endpoint.address.ip(),
+            RelayEndpointData::Openvpn,
+        );
+
+        LastSelectedRelays::Openvpn {
+            relay,
+            bridge: None,
+        }
+    }
+}
+
+fn custom_relay(host: String, addr: IpAddr, endpoint_data: RelayEndpointData) -> Relay {
+    let (ipv4_addr_in, ipv6_addr_in) = match addr {
+        IpAddr::V4(addr) => (addr, None),
+        // DIRTY HACKS FOR CUSTOM ENDPOINTS!!!
+        IpAddr::V6(addr) => (Ipv4Addr::UNSPECIFIED, Some(addr)),
+    };
+    Relay {
+        hostname: host,
+        ipv4_addr_in,
+        ipv6_addr_in,
+        include_in_country: false,
+        active: true,
+        owned: true,
+        provider: "Custom".to_string(),
+        weight: 0,
+        endpoint_data,
+        location: None,
+    }
+}
+
+fn wg_endpoint_data(public_key: wireguard::PublicKey) -> RelayEndpointData {
+    RelayEndpointData::Wireguard(WireguardRelayEndpointData { public_key })
 }

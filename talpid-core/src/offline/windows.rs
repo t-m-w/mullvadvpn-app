@@ -1,10 +1,7 @@
-use crate::{
-    routing::{get_best_default_route, CallbackHandle, EventType, RouteManagerHandle},
-    windows::{
-        window::{PowerManagementEvent, PowerManagementListener},
-        AddressFamily,
-    },
-};
+use 
+    talpid_routing::{get_best_default_route, CallbackHandle, EventType, RouteManagerHandle},
+;
+use crate::window::{PowerManagementEvent, PowerManagementListener};
 use futures::channel::mpsc::UnboundedSender;
 use parking_lot::Mutex;
 use std::{
@@ -12,6 +9,7 @@ use std::{
     sync::{Arc, Weak},
     time::Duration,
 };
+use talpid_routing::winnet;
 use talpid_types::ErrorExt;
 
 #[derive(err_derive::Error, Debug)]

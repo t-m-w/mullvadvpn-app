@@ -8,11 +8,7 @@ use crate::{
     routing::{self, get_best_default_route, CallbackHandle, EventType, RouteManagerHandle},
     tunnel::TunnelMetadata,
     tunnel_state_machine::TunnelCommand,
-    windows::{
-        get_ip_address_for_interface,
-        window::{PowerManagementEvent, PowerManagementListener},
-        AddressFamily,
-    },
+    window::{PowerManagementEvent, PowerManagementListener},
 };
 use futures::channel::{mpsc, oneshot};
 use std::{
@@ -28,8 +24,14 @@ use std::{
     },
     time::Duration,
 };
+use talpid_routing::winnet::{
+    self, get_best_default_route, WinNetAddrFamily, WinNetCallbackHandle,
+};
 use talpid_types::{tunnel::ErrorStateCause, ErrorExt};
-use windows_sys::Win32::Foundation::ERROR_OPERATION_ABORTED;
+use talpid_windows::net::{get_ip_address_for_interface, AddressFamily};
+use windows_sys::Win32::{
+    Foundation::ERROR_OPERATION_ABORTED,
+};
 
 const DRIVER_EVENT_BUFFER_SIZE: usize = 2048;
 const RESERVED_IP_V4: Ipv4Addr = Ipv4Addr::new(192, 0, 2, 123);
@@ -72,11 +74,11 @@ pub enum Error {
 
     /// Failed to obtain default route
     #[error(display = "Failed to obtain the default route")]
-    ObtainDefaultRoute(#[error(source)] routing::Error),
+    ObtainDefaultRoute(#[error(source)] talpid_routing::winnet::Error),
 
     /// Failed to obtain an IP address given a network interface LUID
     #[error(display = "Failed to obtain IP address for interface LUID")]
-    LuidToIp(#[error(source)] crate::windows::Error),
+    LuidToIp(#[error(source)] talpid_windows::net::Error),
 
     /// Failed to set up callback for monitoring default route changes
     #[error(display = "Failed to register default route change callback")]

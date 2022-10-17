@@ -10,7 +10,7 @@ use std::{
 use talpid_windows::logging::log_sink;
 use widestring::WideCString;
 
-/// Errors that this module may produce.
+/// Winnet errors
 #[derive(err_derive::Error, Debug)]
 pub enum Error {
     /// Supplied interface alias is invalid.
@@ -50,6 +50,7 @@ fn logging_context() -> *const u8 {
     b"WinNet\0".as_ptr()
 }
 
+/// IP address family
 #[derive(Debug, Default, Clone, Copy)]
 #[allow(dead_code)]
 #[repr(u32)]
@@ -60,6 +61,7 @@ pub enum WinNetAddrFamily {
 }
 
 impl WinNetAddrFamily {
+    /// Convert the address family to the apporpriate Windows enum value
     pub fn to_windows_proto_enum(&self) -> u16 {
         match self {
             Self::IPV4 => 2,
@@ -68,6 +70,7 @@ impl WinNetAddrFamily {
     }
 }
 
+/// Representation of IP address in winnet
 #[repr(C)]
 #[derive(Default)]
 pub struct WinNetIp {
@@ -75,6 +78,7 @@ pub struct WinNetIp {
     pub ip_bytes: [u8; 16],
 }
 
+/// A default route with an address
 #[repr(C)]
 #[derive(Default)]
 pub struct WinNetDefaultRoute {
@@ -82,6 +86,8 @@ pub struct WinNetDefaultRoute {
     pub gateway: WinNetIp,
 }
 
+/// Failure to convert a [WinNetIp](WinNetip) to an IP address from the standard library due to
+/// mistmatching IP families.
 #[derive(Debug)]
 pub struct WrongIpFamilyError;
 
@@ -143,6 +149,7 @@ impl From<IpAddr> for WinNetIp {
     }
 }
 
+/// IP network representation in WinNet
 #[repr(C)]
 pub struct WinNetIpNetwork {
     prefix: u8,
@@ -158,6 +165,7 @@ impl From<IpNetwork> for WinNetIpNetwork {
     }
 }
 
+/// Route node representation in WinNetNode.
 #[repr(C)]
 pub struct WinNetNode {
     gateway: *mut WinNetIp,
@@ -221,6 +229,7 @@ impl Drop for WinNetNode {
     }
 }
 
+/// A WinNet representation of a network route.
 #[repr(C)]
 pub struct WinNetRoute {
     gateway: WinNetIpNetwork,
@@ -228,16 +237,21 @@ pub struct WinNetRoute {
 }
 
 impl WinNetRoute {
-    pub fn through_default_node(gateway: WinNetIpNetwork) -> Self {
+    /// Construct a network route to a destination that uses the default gateway.
+    pub fn through_default_node(destination: WinNetIpNetwork) -> Self {
         Self {
-            gateway,
+            gateway: destination,
             node: ptr::null_mut(),
         }
     }
 
-    pub fn new(node: WinNetNode, gateway: WinNetIpNetwork) -> Self {
+    /// Construct a new network route from the given node and destination.
+    pub fn new(node: WinNetNode, destination: WinNetIpNetwork) -> Self {
         let node = Box::into_raw(Box::new(node));
-        Self { gateway, node }
+        Self {
+            gateway: destination,
+            node,
+        }
     }
 }
 
@@ -252,10 +266,12 @@ impl Drop for WinNetRoute {
     }
 }
 
+/// Activates the routing manager. This should only be done once in a process' lifetime.
 pub fn activate_routing_manager() -> bool {
     unsafe { WinNet_ActivateRouteManager(Some(log_sink), logging_context()) }
 }
 
+/// WinNet callback handle, used to invalidate and remove a default route change callback.
 pub struct WinNetCallbackHandle {
     handle: *mut libc::c_void,
     // Allows us to keep the context pointer alive.
@@ -270,6 +286,7 @@ impl Drop for WinNetCallbackHandle {
     }
 }
 
+/// Indicates the type of default route change that triggered the default route change callback.
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[allow(dead_code)]
 #[repr(u16)]
@@ -279,6 +296,7 @@ pub enum WinNetDefaultRouteChangeEventType {
     DefaultRouteRemoved = 2,
 }
 
+/// Dfeault route callback function signature.
 pub type DefaultRouteChangedCallback = unsafe extern "system" fn(
     event_type: WinNetDefaultRouteChangeEventType,
     family: WinNetAddrFamily,
@@ -286,10 +304,12 @@ pub type DefaultRouteChangedCallback = unsafe extern "system" fn(
     ctx: *mut c_void,
 );
 
+/// Failure to set up a default route change callback.
 #[derive(err_derive::Error, Debug)]
 #[error(display = "Failed to set callback for default route")]
 pub struct DefaultRouteCallbackError;
 
+/// Set a callback that is executed when the default route changes.
 pub fn add_default_route_change_callback<T: 'static>(
     callback: Option<DefaultRouteChangedCallback>,
     context: T,
@@ -310,6 +330,7 @@ pub fn add_default_route_change_callback<T: 'static>(
     }
 }
 
+/// Add routes to the routing table.
 pub fn routing_manager_add_routes(routes: &[WinNetRoute]) -> Result<(), Error> {
     let ptr = routes.as_ptr();
     let length: u32 = routes.len() as u32;
@@ -322,10 +343,12 @@ pub fn routing_manager_add_routes(routes: &[WinNetRoute]) -> Result<(), Error> {
     }
 }
 
+/// Remove previously applied routes.
 pub fn routing_manager_delete_applied_routes() -> bool {
     unsafe { WinNet_DeleteAppliedRoutes() }
 }
 
+/// Disable routing manager.
 pub fn deactivate_routing_manager() {
     unsafe { WinNet_DeactivateRouteManager() }
 }

@@ -2,9 +2,11 @@ use std::{io, net::IpAddr};
 use talpid_types::ErrorExt;
 use talpid_windows::{
     net::{guid_from_luid, luid_from_alias},
-    string::string_from_guid,
 };
-use windows_sys::core::GUID;
+use windows_sys::{
+    core::GUID,
+    Win32::System::Com::StringFromGUID2,
+};
 use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_SET_VALUE},
     transaction::Transaction,
@@ -146,4 +148,15 @@ fn config_interface<'a>(
 
 fn flush_dns_cache() -> Result<(), Error> {
     dnsapi::flush_resolver_cache().map_err(Error::FlushResolverCacheError)
+}
+
+/// Obtain a string representation for a GUID object.
+fn string_from_guid(guid: &GUID) -> String {
+    let mut buffer = [0u16; 40];
+    let length = unsafe { StringFromGUID2(guid, &mut buffer[0] as *mut _, buffer.len() as i32 - 1) }
+        as usize;
+    // cannot fail because `buffer` is large enough
+    assert!(length > 0);
+    let length = length - 1;
+    String::from_utf16(&buffer[0..length]).unwrap()
 }

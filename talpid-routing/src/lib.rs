@@ -40,7 +40,8 @@ pub struct Route {
 }
 
 impl Route {
-    fn new(node: Node, prefix: IpNetwork) -> Self {
+    /// Construct a new Route
+    pub fn new(node: Node, prefix: IpNetwork) -> Self {
         Self {
             node,
             prefix,

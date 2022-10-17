@@ -25,8 +25,10 @@ mod get_best_default_route;
 mod route_manager;
 mod default_route_monitor;
 /// Misc networking functions for Windows.
+#[allow(missing_docs)]
 pub mod winnet;
 
+/// Code for manipulating the routing table on Windows.
 pub mod routing;
 
 /// Windows routing errors.

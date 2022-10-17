@@ -22,7 +22,6 @@ use std::{
     time::Duration,
 };
 use talpid_types::ErrorExt;
-use talpid_windows::driver::as_uninit_byte_slice;
 use windows_sys::Win32::{
     Foundation::{
         ERROR_ACCESS_DENIED, ERROR_FILE_NOT_FOUND, ERROR_INVALID_PARAMETER, ERROR_IO_PENDING,
@@ -993,4 +992,9 @@ fn write_string_to_buffer(buffer: &mut [MaybeUninit<u8>], byte_offset: usize, st
     {
         buffer[byte_offset + i] = MaybeUninit::new(byte);
     }
+}
+
+/// Casts a struct to a slice of possibly uninitialized bytes.
+pub fn as_uninit_byte_slice<T: Copy + Sized>(value: &T) -> &[mem::MaybeUninit<u8>] {
+    unsafe { std::slice::from_raw_parts(value as *const _ as *const _, mem::size_of::<T>()) }
 }

@@ -5,8 +5,6 @@ use super::{
 use crate::logging::{clean_up_logging, initialize_logging, wg_go_logging_callback, WgLogLevel};
 #[cfg(windows)]
 use futures::SinkExt;
-#[cfg(not(windows))]
-use ipnetwork::IpNetwork;
 use std::{
     ffi::{c_void, CStr},
     future::Future,
@@ -14,11 +12,11 @@ use std::{
     path::Path,
     pin::Pin,
 };
-#[cfg(not(windows))]
-use talpid_tunnel::tun_provider::TunProvider;
 #[cfg(windows)]
 use talpid_types::BoxedError;
 use zeroize::Zeroize;
+#[cfg(not(windows))]
+use {ipnetwork::IpNetwork, talpid_tunnel::tun_provider::TunProvider};
 
 #[cfg(target_os = "windows")]
 use std::ffi::CString;

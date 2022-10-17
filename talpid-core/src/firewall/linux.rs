@@ -11,7 +11,7 @@ use nftnl::{
 use std::{
     env,
     ffi::{CStr, CString},
-    io,
+    fs, io,
     net::{IpAddr, Ipv4Addr},
 };
 use talpid_types::net::{AllowedTunnelTraffic, Endpoint, TransportProtocol};
@@ -19,6 +19,7 @@ use talpid_types::net::{AllowedTunnelTraffic, Endpoint, TransportProtocol};
 /// Priority for rules that tag split tunneling packets. Equals NF_IP_PRI_MANGLE.
 const MANGLE_CHAIN_PRIORITY: i32 = libc::NF_IP_PRI_MANGLE;
 const PREROUTING_CHAIN_PRIORITY: i32 = libc::NF_IP_PRI_CONNTRACK + 1;
+const PROC_SYS_NET_IPV4_CONF_SRC_VALID_MARK: &str = "/proc/sys/net/ipv4/conf/all/src_valid_mark";
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -1062,4 +1063,8 @@ fn add_verdict(rule: &mut Rule<'_>, verdict: &expr::Verdict) {
         rule.add_expr(&nft_expr!(counter));
     }
     rule.add_expr(verdict);
+}
+
+fn set_src_valid_mark_sysctl() -> io::Result<()> {
+    fs::write(PROC_SYS_NET_IPV4_CONF_SRC_VALID_MARK, b"1")
 }

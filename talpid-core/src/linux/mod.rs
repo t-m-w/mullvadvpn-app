@@ -3,7 +3,6 @@ use std::{
     fs, io,
 };
 
-const PROC_SYS_NET_IPV4_CONF_SRC_VALID_MARK: &str = "/proc/sys/net/ipv4/conf/all/src_valid_mark";
 
 /// Converts an interface name into the corresponding index.
 pub fn iface_index(name: &str) -> Result<libc::c_uint, IfaceIndexLookupError> {
@@ -26,8 +25,4 @@ pub enum IfaceIndexLookupError {
     InvalidInterfaceName(String, #[error(source)] ffi::NulError),
     #[error(display = "Failed to get index for interface {}", _0)]
     InterfaceLookupError(String, #[error(source)] io::Error),
-}
-
-pub fn set_src_valid_mark_sysctl() -> io::Result<()> {
-    fs::write(PROC_SYS_NET_IPV4_CONF_SRC_VALID_MARK, b"1")
 }

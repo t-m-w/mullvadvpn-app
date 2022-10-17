@@ -17,7 +17,6 @@ use tun_provider::TunProvider;
 /// Arguments for creating a tunnel.
 pub struct TunnelArgs<'a, L>
 where
-    // L: (Fn(TunnelEvent) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send>>)
     L: (Fn(TunnelEvent) -> BoxFuture<'static, ()>) + Send + Clone + Sync + 'static,
 {
     /// Toktio runtime handle.

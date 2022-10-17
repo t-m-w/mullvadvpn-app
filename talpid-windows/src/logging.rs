@@ -35,7 +35,7 @@ pub extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: 
     }
 }
 
-pub fn multibyte_to_wide(mb_string: &CStr, codepage: u32) -> Result<Vec<u16>, io::Error> {
+fn multibyte_to_wide(mb_string: &CStr, codepage: u32) -> Result<Vec<u16>, io::Error> {
     if unsafe { *mb_string.as_ptr() } == 0 {
         return Ok(vec![]);
     }

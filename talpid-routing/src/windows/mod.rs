@@ -17,8 +17,8 @@ use futures::{
     StreamExt,
 };
 use std::{collections::HashSet, net::IpAddr};
-use talpid_windows::net;
 use windows_sys::Win32::NetworkManagement::Ndis::NET_LUID_LH;
+use talpid_windows_net as net;
 use winnet::WinNetAddrFamily;
 
 mod get_best_default_route;

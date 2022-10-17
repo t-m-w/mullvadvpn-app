@@ -22,7 +22,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use talpid_types::{BoxedError, ErrorExt};
-use talpid_windows::net;
+use talpid_windows_net as net;
 use widestring::{U16CStr, U16CString};
 use windows_sys::{
     core::GUID,
@@ -1041,7 +1041,7 @@ mod tests {
                 public_key: WG_PUBLIC_KEY.as_bytes().clone(),
                 preshared_key: [0; WIREGUARD_KEY_LENGTH],
                 persistent_keepalive: 0,
-                endpoint: talpid_windows::net::inet_sockaddr_from_socketaddr(
+                endpoint: talpid_windows_net::inet_sockaddr_from_socketaddr(
                     "1.2.3.4:1234".parse().unwrap()
                 )
                 .into(),

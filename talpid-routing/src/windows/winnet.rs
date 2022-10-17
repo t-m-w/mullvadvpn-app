@@ -385,7 +385,10 @@ pub fn get_best_default_route(
 #[allow(non_snake_case)]
 mod api {
     use super::DefaultRouteChangedCallback;
-    use talpid_windows::logging::LogSink;
+
+    /// Logging callback type.
+    pub type LogSink =
+        extern "system" fn(level: log::Level, msg: *const libc::c_char, context: *mut libc::c_void);
 
     #[allow(dead_code)]
     #[repr(u32)]
@@ -451,8 +454,6 @@ mod api {
 }
 
 /// TODO: Remove this code once winnet is ported.
-/// Logging callback type.
-pub type LogSink = extern "system" fn(level: log::Level, msg: *const c_char, context: *mut c_void);
 
 /// Logging callback implementation.
 pub extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: *mut c_void) {

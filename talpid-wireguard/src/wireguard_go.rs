@@ -175,7 +175,7 @@ impl WgGoTunnel {
             log::debug!("Waiting for tunnel IP interfaces to arrive");
 
             let prepare_interfaces = async move {
-                talpid_windows::net::wait_for_interfaces(luid, true, has_ipv6).await?;
+                talpid_windows_net::wait_for_interfaces(luid, true, has_ipv6).await?;
 
                 if let Err(error) =
                     talpid_tunnel::network_interface::initialize_interfaces(luid, None)

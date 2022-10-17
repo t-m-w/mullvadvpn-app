@@ -43,7 +43,7 @@ which = { version = "4.0", default-features = false }
 widestring = "0.5"
 winreg = { version = "0.7", features = ["transactions"] }
 winapi = { version = "0.3.6", features = ["ws2def"] }
-talpid-windows = { path = "../talpid-windows" }
+talpid-windows-net = { path = "../talpid-windows-net" }
 
 [target.'cfg(windows)'.dependencies.windows-sys]
 version = "0.42.0"

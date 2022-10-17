@@ -1,14 +1,17 @@
+#[allow(missing_docs)]
 use self::api::*;
 use crate::Node;
 use ipnetwork::IpNetwork;
-use libc::c_void;
+use libc::{c_char, c_void};
 use std::{
     convert::TryFrom,
+    ffi::CStr,
+    io,
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
     ptr,
 };
-use talpid_windows::logging::log_sink;
 use widestring::WideCString;
+use windows_sys::Win32::Globalization::{MultiByteToWideChar, CP_ACP};
 
 /// Winnet errors
 #[derive(err_derive::Error, Debug)]
@@ -55,8 +58,10 @@ fn logging_context() -> *const u8 {
 #[allow(dead_code)]
 #[repr(u32)]
 pub enum WinNetAddrFamily {
+    /// IPv4
     #[default]
     IPV4 = 0,
+    /// IPv6
     IPV6 = 1,
 }
 
@@ -74,7 +79,10 @@ impl WinNetAddrFamily {
 #[repr(C)]
 #[derive(Default)]
 pub struct WinNetIp {
+    /// Address family
     pub addr_family: WinNetAddrFamily,
+    /// Bytes representing the IP address. IPv4 addresses are represented using only the first 4
+    /// bytes.
     pub ip_bytes: [u8; 16],
 }
 
@@ -83,6 +91,7 @@ pub struct WinNetIp {
 #[derive(Default)]
 pub struct WinNetDefaultRoute {
     pub interface_luid: u64,
+    /// Erroneously
     pub gateway: WinNetIp,
 }
 
@@ -266,7 +275,8 @@ impl Drop for WinNetRoute {
     }
 }
 
-/// Activates the routing manager. This should only be done once in a process' lifetime.
+/// Activates the routing manager. Returns false if activation failed - this
+/// should only happen if the routing manager is already activated.
 pub fn activate_routing_manager() -> bool {
     unsafe { WinNet_ActivateRouteManager(Some(log_sink), logging_context()) }
 }
@@ -353,6 +363,7 @@ pub fn deactivate_routing_manager() {
     unsafe { WinNet_DeactivateRouteManager() }
 }
 
+/// Obtains the default route that will be used to most traffic.
 pub fn get_best_default_route(
     family: WinNetAddrFamily,
 ) -> Result<Option<WinNetDefaultRoute>, Error> {
@@ -437,4 +448,80 @@ mod api {
         #[link_name = "WinNet_UnregisterDefaultRouteChangedCallback"]
         pub fn WinNet_UnregisterDefaultRouteChangedCallback(registrationHandle: *mut libc::c_void);
     }
+}
+
+/// TODO: Remove this code once winnet is ported.
+/// Logging callback type.
+pub type LogSink = extern "system" fn(level: log::Level, msg: *const c_char, context: *mut c_void);
+
+/// Logging callback implementation.
+pub extern "system" fn log_sink(level: log::Level, msg: *const c_char, context: *mut c_void) {
+    if msg.is_null() {
+        log::error!("Log message from FFI boundary is NULL");
+    } else {
+        let rust_log_level = log::Level::from(level);
+        let target = if context.is_null() {
+            "UNKNOWN".into()
+        } else {
+            unsafe { CStr::from_ptr(context as *const _).to_string_lossy() }
+        };
+
+        let mb_string = unsafe { CStr::from_ptr(msg) };
+
+        let managed_msg = match multibyte_to_wide(mb_string, CP_ACP) {
+            Ok(wide_str) => String::from_utf16_lossy(&wide_str),
+            // Best effort:
+            Err(_) => mb_string.to_string_lossy().into_owned(),
+        };
+
+        log::logger().log(
+            &log::Record::builder()
+                .level(rust_log_level)
+                .target(&target)
+                .args(format_args!("{}", managed_msg))
+                .build(),
+        );
+    }
+}
+
+fn multibyte_to_wide(mb_string: &CStr, codepage: u32) -> Result<Vec<u16>, io::Error> {
+    if unsafe { *mb_string.as_ptr() } == 0 {
+        return Ok(vec![]);
+    }
+
+    let wc_size = unsafe {
+        MultiByteToWideChar(
+            codepage,
+            0,
+            mb_string.as_ptr() as *const u8,
+            -1,
+            ptr::null_mut(),
+            0,
+        )
+    };
+
+    if wc_size == 0 {
+        return Err(io::Error::last_os_error());
+    }
+
+    let mut wc_buffer = Vec::with_capacity(wc_size as usize);
+
+    let chars_written = unsafe {
+        MultiByteToWideChar(
+            codepage,
+            0,
+            mb_string.as_ptr() as *const u8,
+            -1,
+            wc_buffer.as_mut_ptr(),
+            wc_size,
+        )
+    };
+
+    if chars_written == 0 {
+        return Err(io::Error::last_os_error());
+    }
+
+    unsafe { wc_buffer.set_len((chars_written - 1) as usize) };
+
+    Ok(wc_buffer)
 }

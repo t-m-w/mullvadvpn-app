@@ -824,7 +824,7 @@ fn serialize_config(config: &Config) -> Result<Vec<MaybeUninit<u8>>> {
         peers_count: config.peers.len() as u32,
     };
 
-    buffer.extend(talpid_windows::driver::as_uninit_byte_slice(&header));
+    buffer.extend(as_uninit_byte_slice(&header));
 
     for peer in &config.peers {
         let flags = if peer.psk.is_some() {
@@ -849,7 +849,7 @@ fn serialize_config(config: &Config) -> Result<Vec<MaybeUninit<u8>>> {
             allowed_ips_count: peer.allowed_ips.len() as u32,
         };
 
-        buffer.extend(talpid_windows::driver::as_uninit_byte_slice(&wg_peer));
+        buffer.extend(as_uninit_byte_slice(&wg_peer));
 
         for allowed_ip in &peer.allowed_ips {
             let address_family = match allowed_ip {
@@ -864,7 +864,7 @@ fn serialize_config(config: &Config) -> Result<Vec<MaybeUninit<u8>>> {
             let wg_allowed_ip =
                 WgAllowedIp::new(address, address_family, allowed_ip.prefix() as u8)?;
 
-            buffer.extend(talpid_windows::driver::as_uninit_byte_slice(&wg_allowed_ip));
+            buffer.extend(as_uninit_byte_slice(&wg_allowed_ip));
         }
     }
 
@@ -986,6 +986,10 @@ impl Tunnel for WgNtTunnel {
     }
 }
 
+pub fn as_uninit_byte_slice<T: Copy + Sized>(value: &T) -> &[mem::MaybeUninit<u8>] {
+    unsafe { std::slice::from_raw_parts(value as *const _ as *const _, mem::size_of::<T>()) }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1076,7 +1080,7 @@ mod tests {
 
     #[test]
     fn test_config_deserialization() {
-        let config_buffer = talpid_windows::driver::as_uninit_byte_slice(&*WG_STRUCT_CONFIG);
+        let config_buffer = as_uninit_byte_slice(&*WG_STRUCT_CONFIG);
         let (iface, peers) = unsafe { deserialize_config(config_buffer) }.unwrap();
         assert_eq!(iface, WG_STRUCT_CONFIG.interface);
         assert_eq!(peers.len(), 1);

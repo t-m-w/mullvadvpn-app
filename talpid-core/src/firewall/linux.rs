@@ -157,7 +157,7 @@ impl Firewall {
         }
 
         if let FirewallPolicy::Connecting { .. } = policy {
-            if let Err(err) = crate::linux::set_src_valid_mark_sysctl() {
+            if let Err(err) = set_src_valid_mark_sysctl() {
                 log::error!("Failed to apply src_valid_mark: {}", err);
             }
         }

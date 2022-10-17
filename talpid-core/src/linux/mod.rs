@@ -1,8 +1,7 @@
 use std::{
     ffi::{self, CString},
-    fs, io,
+    io,
 };
-
 
 /// Converts an interface name into the corresponding index.
 pub fn iface_index(name: &str) -> Result<libc::c_uint, IfaceIndexLookupError> {

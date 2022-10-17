@@ -4,9 +4,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-#[cfg(any(target_os = "macos", target_os = "linux"))]
-mod network_interface;
-
 #[cfg(windows)]
 #[path = "windows.rs"]
 pub mod network_interface;

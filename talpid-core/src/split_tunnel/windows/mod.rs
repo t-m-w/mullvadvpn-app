@@ -28,7 +28,7 @@ use talpid_routing::winnet::{
     self, get_best_default_route, WinNetAddrFamily, WinNetCallbackHandle,
 };
 use talpid_types::{tunnel::ErrorStateCause, ErrorExt};
-use talpid_windows::net::{get_ip_address_for_interface, AddressFamily};
+use talpid_windows_net::{get_ip_address_for_interface, AddressFamily};
 use windows_sys::Win32::{
     Foundation::ERROR_OPERATION_ABORTED,
 };
@@ -78,7 +78,7 @@ pub enum Error {
 
     /// Failed to obtain an IP address given a network interface LUID
     #[error(display = "Failed to obtain IP address for interface LUID")]
-    LuidToIp(#[error(source)] talpid_windows::net::Error),
+    LuidToIp(#[error(source)] talpid_windows_net::Error),
 
     /// Failed to set up callback for monitoring default route changes
     #[error(display = "Failed to register default route change callback")]

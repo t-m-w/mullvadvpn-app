@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
 import net.mullvad.mullvadvpn.R
 
@@ -84,8 +85,9 @@ class NotificationChannel(
             .setColor(badgeColor)
             .setContentTitle(title)
             .setContentIntent(pendingIntent)
-            .setVisibility(visibility)
+            .setVisibility(VISIBILITY_PUBLIC)
             .setOngoing(isOngoing)
+            .setPriority(Notification.PRIORITY_MAX)
         for (action in actions) {
             builder.addAction(action)
         }

@@ -3,9 +3,11 @@ package net.mullvad.mullvadvpn.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +43,7 @@ import net.mullvad.mullvadvpn.ui.widget.HeaderBar
 import net.mullvad.mullvadvpn.ui.widget.NotificationBanner
 import net.mullvad.mullvadvpn.ui.widget.SwitchLocationButton
 import net.mullvad.mullvadvpn.util.JobTracker
+import net.mullvad.mullvadvpn.util.SdkUtils.getAlwaysOnVpnAppName
 import net.mullvad.mullvadvpn.util.appVersionCallbackFlow
 import net.mullvad.mullvadvpn.util.callbackFlowFromNotifier
 import net.mullvad.mullvadvpn.viewmodel.ConnectViewModel
@@ -205,6 +208,13 @@ class ConnectFragment : BaseFragment(), NavigationBarPainter {
             .collect { (uiState, realState) ->
                 tunnelStateNotification.updateTunnelState(uiState)
                 updateTunnelState(uiState, realState)
+
+                //
+                if (realState is TunnelState.Error) {
+                    requireContext().getAlwaysOnVpnAppName()?.let {
+                        Toast.makeText(requireActivity(), it, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
     }
 

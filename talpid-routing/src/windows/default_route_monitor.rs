@@ -1,5 +1,5 @@
 use super::{
-    get_best_default_route, get_best_default_route::route_has_gateway, AddressFamily, Error,
+    get_best_default_route, get_best_default_route::route_has_gateway, Error,
     InterfaceAndGateway, Result,
 };
 
@@ -23,6 +23,8 @@ use windows_sys::Win32::{
         Ndis::NET_LUID_LH,
     },
 };
+
+use talpid_windows_net::AddressFamily;
 
 const WIN_FALSE: BOOLEAN = 0;
 

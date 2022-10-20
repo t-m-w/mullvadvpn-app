@@ -1,4 +1,4 @@
-use crate::{routing::RequiredRoute, windows::AddressFamily};
+use crate::{RequiredRoute};
 use futures::channel::oneshot;
 use std::{collections::HashSet, io, net::IpAddr};
 use talpid_types::ErrorExt;
@@ -7,7 +7,6 @@ use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 pub use default_route_monitor::EventType;
 pub use get_best_default_route::{get_best_default_route, route_has_gateway, InterfaceAndGateway};
 pub use route_manager::{Callback, CallbackHandle, Route, RouteManagerInternal};
-use super::NetNode;
 use crate::RequiredRoute;
 use futures::{
     channel::{
@@ -19,6 +18,7 @@ use futures::{
 use std::{collections::HashSet, net::IpAddr};
 use windows_sys::Win32::NetworkManagement::Ndis::NET_LUID_LH;
 use talpid_windows_net as net;
+use net::AddressFamily;
 use winnet::WinNetAddrFamily;
 
 mod get_best_default_route;
@@ -167,7 +167,6 @@ impl RouteManagerHandle {
     }
 }
 
-<<<<<<< HEAD
 pub enum RouteManagerCommand {
     AddRoutes(HashSet<RequiredRoute>, oneshot::Sender<Result<()>>),
     GetMtuForRoute(IpAddr, oneshot::Sender<Result<u16>>),

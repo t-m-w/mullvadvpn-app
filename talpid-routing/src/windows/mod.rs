@@ -17,9 +17,6 @@ use talpid_windows_net as net;
 mod default_route_monitor;
 mod get_best_default_route;
 mod route_manager;
-/// Misc networking functions for Windows.
-#[allow(missing_docs)]
-pub mod winnet;
 
 /// Code for manipulating the routing table on Windows.
 pub mod routing;

@@ -36,8 +36,6 @@ use {
 type Result<T> = std::result::Result<T, TunnelError>;
 
 #[cfg(target_os = "windows")]
-use talpid_routing::winnet;
-
 #[cfg(not(target_os = "windows"))]
 use std::sync::{Arc, Mutex};
 
@@ -62,7 +60,7 @@ pub struct WgGoTunnel {
     // context that maps to fs::File instance, used with logging callback
     _logging_context: LoggingContext,
     #[cfg(target_os = "windows")]
-    _route_callback_handle: Option<talpid_routing::winnet::WinNetCallbackHandle>,
+    _route_callback_handle: Option<talpid_routing::CallbackHandle>,
     #[cfg(target_os = "windows")]
     setup_handle: tokio::task::JoinHandle<()>,
 }
@@ -113,7 +111,7 @@ impl WgGoTunnel {
     pub fn start_tunnel(
         config: &Config,
         log_path: Option<&Path>,
-        route_manager_handle: crate::tunnel::RouteManagerHandle,
+        route_manager_handle: talpid_routing::RouteManagerHandle,
         mut done_tx: futures::channel::mpsc::Sender<std::result::Result<(), BoxedError>>,
         runtime: &tokio::runtime::Handle,
     ) -> Result<Self> {
@@ -212,7 +210,7 @@ impl WgGoTunnel {
     #[cfg(target_os = "windows")]
     pub fn default_route_changed_callback<'a>(
         event_type: crate::routing::EventType<'a>,
-        address_family: crate::windows::AddressFamily,
+        address_family: talpid_windows_net::AddressFamily,
     ) {
         use crate::routing::EventType::*;
         use windows_sys::Win32::NetworkManagement::IpHelper::ConvertInterfaceLuidToIndex;

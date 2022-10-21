@@ -27,9 +27,6 @@ use talpid_types::{
     ErrorExt,
 };
 
-#[cfg(windows)]
-use talpid_routing::{self as routing, winnet};
-
 #[cfg(target_os = "android")]
 use talpid_tunnel::tun_provider;
 
@@ -521,7 +518,7 @@ fn should_retry(error: &tunnel::Error, retry_attempt: u32) -> bool {
 #[cfg(windows)]
 fn is_recoverable_routing_error(error: &talpid_routing::Error) -> bool {
     match error {
-        routing::Error::AddRoutesFailed(_) => true,
+        talpid_routing::Error::AddRoutesFailed(_) => true,
         _ => false,
     }
 }

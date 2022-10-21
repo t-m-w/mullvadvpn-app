@@ -2,16 +2,16 @@ use super::{
     default_route_monitor::{DefaultRouteMonitor, EventType as RouteMonitorEventType},
     get_best_default_route, Error, InterfaceAndGateway, Result,
 };
-use crate::{
-    routing::NetNode,
-    windows::{inet_sockaddr_from_socketaddr, try_socketaddr_from_inet_sockaddr, AddressFamily},
-};
+use crate::NetNode;
 use ipnetwork::IpNetwork;
 use std::{
     collections::HashMap,
     io,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
     sync::{Arc, Mutex},
+};
+use talpid_windows_net::{
+    inet_sockaddr_from_socketaddr, try_socketaddr_from_inet_sockaddr, AddressFamily,
 };
 use widestring::{WideCStr, WideCString};
 use windows_sys::Win32::{
@@ -862,7 +862,7 @@ impl<'a> Iterator for AdaptersIterator<'a> {
 pub fn win_ip_address_prefix_from_ipnetwork_port_zero(from: IpNetwork) -> IP_ADDRESS_PREFIX {
     // Port should not matter so we set it to 0
     let prefix =
-        crate::windows::inet_sockaddr_from_socketaddr(std::net::SocketAddr::new(from.ip(), 0));
+        talpid_windows_net::inet_sockaddr_from_socketaddr(std::net::SocketAddr::new(from.ip(), 0));
     IP_ADDRESS_PREFIX {
         Prefix: prefix,
         PrefixLength: from.prefix(),
@@ -872,7 +872,7 @@ pub fn win_ip_address_prefix_from_ipnetwork_port_zero(from: IpNetwork) -> IP_ADD
 /// Convert to a windows defined `SOCKADDR_INET` from a `IpAddr` but set the port to 0
 pub fn inet_sockaddr_from_ipaddr(from: IpAddr) -> SOCKADDR_INET {
     // Port should not matter so we set it to 0
-    crate::windows::inet_sockaddr_from_socketaddr(std::net::SocketAddr::new(from, 0))
+    talpid_windows_net::inet_sockaddr_from_socketaddr(std::net::SocketAddr::new(from, 0))
 }
 
 /// Convert to a `AddressFamily` from a `ipnetwork::IpNetwork`

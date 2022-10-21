@@ -1,6 +1,6 @@
 use 
-    talpid_routing::{get_best_default_route, CallbackHandle, EventType, RouteManagerHandle},
-;
+    talpid_routing::{get_best_default_route, CallbackHandle, EventType, RouteManagerHandle};
+
 use crate::window::{PowerManagementEvent, PowerManagementListener};
 use futures::channel::mpsc::UnboundedSender;
 use parking_lot::Mutex;
@@ -9,15 +9,15 @@ use std::{
     sync::{Arc, Weak},
     time::Duration,
 };
-use talpid_routing::winnet;
 use talpid_types::ErrorExt;
+use talpid_windows_net::AddressFamily;
 
 #[derive(err_derive::Error, Debug)]
 pub enum Error {
     #[error(display = "Unable to create listener thread")]
     ThreadCreationError(#[error(source)] io::Error),
     #[error(display = "Failed to start connectivity monitor")]
-    ConnectivityMonitorError(#[error(source)] crate::routing::Error),
+    ConnectivityMonitorError(#[error(source)] talpid_routing::Error),
 }
 
 pub struct BroadcastListener {
@@ -123,7 +123,7 @@ impl BroadcastListener {
         family: AddressFamily,
         state_lock: &Arc<Mutex<SystemState>>,
     ) {
-        use crate::routing::EventType::*;
+        use talpid_routing::EventType::*;
 
         if matches!(event_type, UpdatedDetails(_)) {
             // ignore changes that don't affect the route

@@ -1,5 +1,5 @@
 use super::{Error, Result};
-use crate::windows::{get_ip_interface_entry, try_socketaddr_from_inet_sockaddr, AddressFamily};
+use talpid_windows_net::{get_ip_interface_entry, try_socketaddr_from_inet_sockaddr, AddressFamily};
 use std::{convert::TryInto, io, net::SocketAddr};
 use widestring::{widecstr, WideCStr};
 use windows_sys::Win32::{

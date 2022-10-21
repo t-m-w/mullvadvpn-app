@@ -33,7 +33,7 @@ pub enum Error {
     /// Failure in Windows syscall.
     #[cfg(windows)]
     #[error(display = "Failure in Windows syscall")]
-    WinnetError(#[error(source)] talpid_routing::winnet::Error),
+    WinnetError(#[error(source)] talpid_routing::Error),
 
     /// Running on an operating system which is not supported yet.
     #[error(display = "Tunnel type not supported on this operating system")]

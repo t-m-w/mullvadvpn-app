@@ -3,7 +3,7 @@ mod win {
     use std::{env, path::PathBuf};
 
     pub fn declare_winnet_dependency() {
-        const WINNET_BUILD_DIR: &'static str = "..\\windows\\winnet\\bin";
+        const WINNET_BUILD_DIR: &str = "..\\windows\\winnet\\bin";
         const WINNET_DIR_VAR: &str = "WINNET_LIB_DIR";
         declare_library(WINNET_DIR_VAR, WINNET_BUILD_DIR, "winnet");
     }

@@ -1,13 +1,5 @@
-use crate::{RequiredRoute};
-use futures::channel::oneshot;
-use std::{collections::HashSet, io, net::IpAddr};
-use talpid_types::ErrorExt;
-use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
-
-pub use default_route_monitor::EventType;
-pub use get_best_default_route::{get_best_default_route, route_has_gateway, InterfaceAndGateway};
-pub use route_manager::{Callback, CallbackHandle, Route, RouteManagerInternal};
 use crate::RequiredRoute;
+pub use default_route_monitor::EventType;
 use futures::{
     channel::{
         mpsc::{self, UnboundedReceiver, UnboundedSender},
@@ -15,15 +7,16 @@ use futures::{
     },
     StreamExt,
 };
-use std::{collections::HashSet, net::IpAddr};
-use windows_sys::Win32::NetworkManagement::Ndis::NET_LUID_LH;
-use talpid_windows_net as net;
+pub use get_best_default_route::{get_best_default_route, route_has_gateway, InterfaceAndGateway};
 use net::AddressFamily;
-use winnet::WinNetAddrFamily;
+pub use route_manager::{Callback, CallbackHandle, Route, RouteManagerInternal};
+use std::{collections::HashSet, io, net::IpAddr};
+use talpid_types::ErrorExt;
+use talpid_windows_net as net;
 
+mod default_route_monitor;
 mod get_best_default_route;
 mod route_manager;
-mod default_route_monitor;
 /// Misc networking functions for Windows.
 #[allow(missing_docs)]
 pub mod winnet;
@@ -102,21 +95,6 @@ pub enum Error {
     /// Could not find device by gateway
     #[error(display = "Could not find device by gateway")]
     GetDeviceByGateway,
-    /// Failure to add routes
-    #[error(display = "Failed to add routes")]
-    AddRoutesFailed(#[error(source)] winnet::Error),
-    /// Failure to clear routes
-    #[error(display = "Failed to clear applied routes")]
-    ClearRoutesFailed,
-    /// WinNet returned an error while adding default route callback
-    #[error(display = "Failed to set callback for default route")]
-    FailedToAddDefaultRouteCallback,
-    /// Attempt to use route manager that has been dropped
-    #[error(display = "Cannot send message to route manager since it is down")]
-    RouteManagerDown,
-    /// Something went wrong when getting the mtu of the interface
-    #[error(display = "Could not get the mtu of the interface")]
-    GetMtu,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -140,7 +118,7 @@ impl RouteManagerHandle {
     ) -> Result<CallbackHandle> {
         let (response_tx, response_rx) = oneshot::channel();
         self.tx
-            .send(RouteManagerCommand::RegisterDefaultRouteChangeCallback(
+            .unbounded_send(RouteManagerCommand::RegisterDefaultRouteChangeCallback(
                 callback,
                 response_tx,
             ))
@@ -152,7 +130,7 @@ impl RouteManagerHandle {
     pub async fn add_routes(&self, routes: HashSet<RequiredRoute>) -> Result<()> {
         let (response_tx, response_rx) = oneshot::channel();
         self.tx
-            .send(RouteManagerCommand::AddRoutes(routes, response_tx))
+            .unbounded_send(RouteManagerCommand::AddRoutes(routes, response_tx))
             .map_err(|_| Error::RouteManagerDown)?;
         response_rx.await.map_err(|_| Error::ManagerChannelDown)?
     }
@@ -161,7 +139,7 @@ impl RouteManagerHandle {
     pub async fn get_mtu_for_route(&self, ip: IpAddr) -> Result<u16> {
         let (response_tx, response_rx) = oneshot::channel();
         self.tx
-            .send(RouteManagerCommand::GetMtuForRoute(ip, response_tx))
+            .unbounded_send(RouteManagerCommand::GetMtuForRoute(ip, response_tx))
             .map_err(|_| Error::RouteManagerDown)?;
         response_rx.await.map_err(|_| Error::ManagerChannelDown)?
     }
@@ -183,7 +161,7 @@ impl RouteManager {
             Ok(internal) => internal,
             Err(_) => return Err(Error::FailedToStartManager),
         };
-        let (manage_tx, manage_rx) = mpsc::unbounded_channel();
+        let (manage_tx, manage_rx) = mpsc::unbounded();
         let manager = Self {
             manage_tx: Some(manage_tx),
         };
@@ -201,7 +179,7 @@ impl RouteManager {
         if let Some(tx) = &self.manage_tx {
             let (result_tx, result_rx) = oneshot::channel();
             if tx
-                .send(RouteManagerCommand::RegisterDefaultRouteChangeCallback(
+                .unbounded_send(RouteManagerCommand::RegisterDefaultRouteChangeCallback(
                     callback, result_tx,
                 ))
                 .is_err()
@@ -227,7 +205,7 @@ impl RouteManager {
         mut manage_rx: UnboundedReceiver<RouteManagerCommand>,
         mut internal: RouteManagerInternal,
     ) {
-        while let Some(command) = manage_rx.recv().await {
+        while let Some(command) = manage_rx.next().await {
             match command {
                 RouteManagerCommand::AddRoutes(routes, tx) => {
                     let routes: Vec<_> = routes
@@ -249,7 +227,6 @@ impl RouteManager {
                         AddressFamily::Ipv4
                     } else {
                         AddressFamily::Ipv6
-
                     };
                     let res = match get_mtu_for_route(addr_family) {
                         Ok(Some(mtu)) => Ok(mtu),
@@ -277,7 +254,7 @@ impl RouteManager {
     /// can be added
     pub fn stop(&mut self) {
         if let Some(tx) = self.manage_tx.take() {
-            if tx.send(RouteManagerCommand::Shutdown).is_err() {
+            if tx.unbounded_send(RouteManagerCommand::Shutdown).is_err() {
                 log::error!("RouteManager channel already down or thread panicked");
             }
         }
@@ -288,7 +265,7 @@ impl RouteManager {
         if let Some(tx) = &self.manage_tx {
             let (result_tx, result_rx) = oneshot::channel();
             if tx
-                .send(RouteManagerCommand::AddRoutes(routes, result_tx))
+                .unbounded_send(RouteManagerCommand::AddRoutes(routes, result_tx))
                 .is_err()
             {
                 return Err(Error::RouteManagerDown);
@@ -303,7 +280,7 @@ impl RouteManager {
     /// [`RouteManager::add_routes`].
     pub fn clear_routes(&self) -> Result<()> {
         if let Some(tx) = &self.manage_tx {
-            tx.send(RouteManagerCommand::ClearRoutes)
+            tx.unbounded_send(RouteManagerCommand::ClearRoutes)
                 .map_err(|_| Error::RouteManagerDown)
         } else {
             Err(Error::RouteManagerDown)
@@ -314,11 +291,13 @@ impl RouteManager {
 fn get_mtu_for_route(addr_family: AddressFamily) -> Result<Option<u16>> {
     match get_best_default_route(addr_family) {
         Ok(Some(route)) => {
-            let interface_row = crate::windows::get_ip_interface_entry(addr_family, &route.iface)
-                .map_err(|e| {
-                log::error!("Could not get ip interface entry: {}", e);
-                Error::GetMtu
-            })?;
+            let interface_row =
+                talpid_windows_net::get_ip_interface_entry(addr_family, &route.iface).map_err(
+                    |e| {
+                        log::error!("Could not get ip interface entry: {}", e);
+                        Error::GetMtu
+                    },
+                )?;
             let mtu = interface_row.NlMtu;
             let mtu = u16::try_from(mtu).map_err(|_| Error::GetMtu)?;
             Ok(Some(mtu))

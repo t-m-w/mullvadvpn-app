@@ -13,12 +13,6 @@ import MullvadTypes
 import Operations
 
 final class AddressCacheTracker {
-    /// Shared instance.
-    static let shared = AddressCacheTracker(
-        apiProxy: REST.ProxyFactory.shared.createAPIProxy(),
-        store: REST.AddressCache.shared
-    )
-
     /// Update interval (in seconds).
     private static let updateInterval: TimeInterval = 60 * 60 * 24
 
@@ -54,7 +48,7 @@ final class AddressCacheTracker {
     private let nslock = NSLock()
 
     /// Designated initializer
-    private init(apiProxy: REST.APIProxy, store: REST.AddressCache) {
+    init(apiProxy: REST.APIProxy, store: REST.AddressCache) {
         self.apiProxy = apiProxy
         self.store = store
     }

@@ -30,6 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return operationQueue
     }()
 
+    private var addressCache: REST.AddressCache!
+    private var restProxyFactory: REST.ProxyFactory!
+    private var addressCacheTracker: AddressCacheTracker!
+    private var relayCacheTracker: RelayCacheTracker!
     private let transportMonitor = TransportMonitor()
 
     // MARK: - Application lifecycle
@@ -44,6 +48,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
 
         logger = Logger(label: "AppDelegate")
+
+        addressCache = REST.AddressCache(
+            securityGroupIdentifier: ApplicationConfiguration.securityGroupIdentifier,
+            isReadOnly: false
+        )!
+        restProxyFactory = REST.ProxyFactory.makeProxyFactory(addressCache: addressCache)
+        relayCacheTracker = RelayCacheTracker(apiProxy: restProxyFactory.createAPIProxy())
+        addressCacheTracker = AddressCacheTracker(
+            apiProxy: restProxyFactory.createAPIProxy(),
+            store: addressCache
+        )
 
         #if targetEnvironment(simulator)
         // Configure mock tunnel provider on simulator
@@ -130,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             forTaskWithIdentifier: ApplicationConfiguration.appRefreshTaskIdentifier,
             using: nil
         ) { task in
-            let handle = RelayCacheTracker.shared.updateRelays { completion in
+            let handle = self.relayCacheTracker.updateRelays { completion in
                 task.setTaskCompleted(success: completion.isSuccess)
             }
 
@@ -176,7 +191,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             forTaskWithIdentifier: ApplicationConfiguration.addressCacheUpdateTaskIdentifier,
             using: nil
         ) { task in
-            let handle = AddressCacheTracker.shared.updateEndpoints { completion in
+            let handle = self.addressCacheTracker.updateEndpoints { completion in
                 self.scheduleAddressCacheUpdateTask()
 
                 task.setTaskCompleted(success: completion.isSuccess)
@@ -202,7 +217,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func scheduleAppRefreshTask() {
         do {
-            let date = RelayCacheTracker.shared.getNextUpdateDate()
+            let date = relayCacheTracker.getNextUpdateDate()
 
             let request = BGAppRefreshTaskRequest(
                 identifier: ApplicationConfiguration.appRefreshTaskIdentifier
@@ -245,7 +260,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func scheduleAddressCacheUpdateTask() {
         do {
-            let date = AddressCacheTracker.shared.nextScheduleDate()
+            let date = addressCacheTracker.nextScheduleDate()
 
             let request = BGProcessingTaskRequest(
                 identifier: ApplicationConfiguration.addressCacheUpdateTaskIdentifier

@@ -14,7 +14,7 @@ import Operations
 import RelayCache
 import UIKit
 
-class RelayCacheTracker {
+final class RelayCacheTracker {
     /// Relay update interval (in seconds).
     static let relayUpdateInterval: TimeInterval = 60 * 60
 
@@ -43,7 +43,7 @@ class RelayCacheTracker {
     private var isPeriodicUpdatesEnabled = false
 
     /// API proxy.
-    private let apiProxy = REST.ProxyFactory.shared.createAPIProxy()
+    private let apiProxy: REST.APIProxy
 
     /// Observers.
     private let observerList = ObserverList<RelayCacheTrackerObserver>()
@@ -51,10 +51,9 @@ class RelayCacheTracker {
     /// Memory cache.
     private var cachedRelays: CachedRelays?
 
-    /// A shared instance of `RelayCacheTracker`.
-    static let shared = RelayCacheTracker()
+    init(apiProxy: REST.APIProxy) {
+        self.apiProxy = apiProxy
 
-    private init() {
         do {
             cachedRelays = try cache.read()
         } catch {

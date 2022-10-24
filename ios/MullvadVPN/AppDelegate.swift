@@ -32,10 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
         return operationQueue
     }()
 
-    private var addressCache: REST.AddressCache!
-    private var restProxyFactory: REST.ProxyFactory!
-    private var addressCacheTracker: AddressCacheTracker!
-    private var relayCacheTracker: RelayCacheTracker!
+    private(set) var addressCache: REST.AddressCache!
+    private(set) var restProxyFactory: REST.ProxyFactory!
+    private(set) var addressCacheTracker: AddressCacheTracker!
+    private(set) var relayCacheTracker: RelayCacheTracker!
     private let transportMonitor = TransportMonitor()
 
     // MARK: - Application lifecycle
@@ -70,6 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
         registerBackgroundTasks()
         setupPaymentHandler()
         setupNotificationHandler()
+        addApplicationNotifications(application: application)
 
         let setupTunnelManagerOperation = AsyncBlockOperation(dispatchQueue: .main) { operation in
             TunnelManager.shared.loadConfiguration { error in
@@ -132,6 +133,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
         // this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to
         // the discarded scenes, as they will not return.
+    }
+
+    // MARK: - Notifications
+
+    @objc func didBecomeActive(_ notification: Notification) {
+        TunnelManager.shared.refreshTunnelStatus()
+        TunnelManager.shared.startPeriodicPrivateKeyRotation()
+        relayCacheTracker.startPeriodicUpdates()
+        addressCacheTracker.startPeriodicUpdates()
+    }
+
+    @objc func willResignActive(_ notification: Notification) {
+        TunnelManager.shared.stopPeriodicPrivateKeyRotation()
+        relayCacheTracker.stopPeriodicUpdates()
+        addressCacheTracker.stopPeriodicUpdates()
     }
 
     // MARK: - Background tasks
@@ -282,6 +298,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
     }
 
     // MARK: - Private
+
+    private func addApplicationNotifications(application: UIApplication) {
+        let notificationCenter = NotificationCenter.default
+
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(didBecomeActive(_:)),
+            name: UIApplication.didBecomeActiveNotification,
+            object: application
+        )
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(willResignActive(_:)),
+            name: UIApplication.willResignActiveNotification,
+            object: application
+        )
+    }
 
     private func setupPaymentHandler() {
         AppStorePaymentManager.shared.delegate = self

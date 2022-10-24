@@ -105,8 +105,6 @@ class SceneDelegate: UIResponder {
     }
 
     @objc private func sceneDidBecomeActive() {
-        TunnelManager.shared.refreshTunnelStatus()
-
         if isSceneConfigured {
             accountDataThrottling.requestUpdate(
                 condition: settingsNavController == nil
@@ -115,19 +113,12 @@ class SceneDelegate: UIResponder {
             )
         }
 
-        RelayCacheTracker.shared.startPeriodicUpdates()
-        TunnelManager.shared.startPeriodicPrivateKeyRotation()
-        AddressCacheTracker.shared.startPeriodicUpdates()
         ShortcutsManager.shared.updateVoiceShortcuts()
 
         setShowsPrivacyOverlay(false)
     }
 
     @objc private func sceneWillResignActive() {
-        RelayCacheTracker.shared.stopPeriodicUpdates()
-        TunnelManager.shared.stopPeriodicPrivateKeyRotation()
-        AddressCacheTracker.shared.stopPeriodicUpdates()
-
         setShowsPrivacyOverlay(true)
     }
 

@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
     private var logger: Logger!
 
     #if targetEnvironment(simulator)
-    private let simulatorTunnelProvider = SimulatorTunnelProviderHost()
+    private var simulatorTunnelProviderHost: SimulatorTunnelProviderHost?
     #endif
 
     private let operationQueue: AsyncOperationQueue = {
@@ -64,7 +64,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
 
         #if targetEnvironment(simulator)
         // Configure mock tunnel provider on simulator
-        SimulatorTunnelProvider.shared.delegate = simulatorTunnelProvider
+        simulatorTunnelProviderHost = SimulatorTunnelProviderHost(
+            relayCacheTracker: relayCacheTracker
+        )
+        SimulatorTunnelProvider.shared.delegate = simulatorTunnelProviderHost
         #endif
 
         registerBackgroundTasks()

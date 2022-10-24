@@ -34,6 +34,18 @@ class SceneDelegate: UIResponder {
     private var accountDataThrottling = AccountDataThrottling()
     private var outOfTimeTimer: Timer?
 
+    private var appDelegate: AppDelegate {
+        return UIApplication.shared.delegate as! AppDelegate
+    }
+
+    private var relayCacheTracker: RelayCacheTracker {
+        return appDelegate.relayCacheTracker
+    }
+
+    private var restProxyFactory: REST.ProxyFactory {
+        return appDelegate.restProxyFactory
+    }
+
     deinit {
         clearOutOfTimeTimer()
     }
@@ -88,7 +100,7 @@ class SceneDelegate: UIResponder {
             fatalError()
         }
 
-        RelayCacheTracker.shared.addObserver(self)
+        relayCacheTracker.addObserver(self)
         NotificationManager.shared.delegate = self
 
         accountDataThrottling.requestUpdate(condition: .always)
@@ -407,7 +419,7 @@ extension SceneDelegate {
         let selectLocationController = SelectLocationViewController()
         selectLocationController.delegate = self
 
-        if let cachedRelays = try? RelayCacheTracker.shared.getCachedRelays() {
+        if let cachedRelays = try? relayCacheTracker.getCachedRelays() {
             selectLocationController.setCachedRelays(cachedRelays)
         }
 
@@ -603,7 +615,10 @@ extension SceneDelegate: LoginViewControllerDelegate {
                     self.lastLoginAction = action
 
                     let deviceController = DeviceManagementViewController(
-                        interactor: DeviceManagementInteractor(accountNumber: accountNumber)
+                        interactor: DeviceManagementInteractor(
+                            accountNumber: accountNumber,
+                            devicesProxy: self.restProxyFactory.createDevicesProxy()
+                        )
                     )
                     deviceController.delegate = self
 

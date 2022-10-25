@@ -99,11 +99,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
     func application(_ application: UIApplication, handlerFor intent: INIntent) -> Any? {
         switch intent {
         case is StartVPNIntent:
-            return StartVPNIntentHandler()
+            return StartVPNIntentHandler(tunnelManager: .shared)
         case is StopVPNIntent:
-            return StopVPNIntentHandler()
+            return StopVPNIntentHandler(tunnelManager: .shared)
         case is ReconnectVPNIntent:
-            return ReconnectVPNIntentHandler()
+            return ReconnectVPNIntentHandler(tunnelManager: .shared)
         default:
             return nil
         }

@@ -46,13 +46,9 @@ final class TunnelManager {
         }
     }
 
-    static let shared = TunnelManager(
-        accountsProxy: REST.ProxyFactory.shared.createAccountsProxy(),
-        devicesProxy: REST.ProxyFactory.shared.createDevicesProxy()
-    )
-
     // MARK: - Internal variables
 
+    private let application: UIApplication
     private let accountsProxy: REST.AccountsProxy
     private let devicesProxy: REST.DevicesProxy
 
@@ -84,7 +80,12 @@ final class TunnelManager {
 
     // MARK: - Initialization
 
-    private init(accountsProxy: REST.AccountsProxy, devicesProxy: REST.DevicesProxy) {
+    init(
+        application: UIApplication,
+        accountsProxy: REST.AccountsProxy,
+        devicesProxy: REST.DevicesProxy
+    ) {
+        self.application = application
         self.accountsProxy = accountsProxy
         self.devicesProxy = devicesProxy
         self.operationQueue.name = "TunnelManager.operationQueue"

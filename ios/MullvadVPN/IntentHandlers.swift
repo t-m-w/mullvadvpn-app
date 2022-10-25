@@ -68,7 +68,7 @@ final class ReconnectVPNIntentHandler: NSObject, ReconnectVPNIntentHandling {
             }
 
             if shouldStartTunnel {
-                tunnelManager.startTunnel { operationCompletion in
+                self.tunnelManager.startTunnel { operationCompletion in
                     completion(
                         ReconnectVPNIntentResponse(
                             code: operationCompletion.isSuccess ? .success : .failure,

@@ -31,7 +31,8 @@ class SceneDelegate: UIResponder {
     private var connectController: ConnectViewController?
     private weak var settingsNavController: SettingsNavigationController?
     private var lastLoginAction: LoginAction?
-    private var accountDataThrottling = AccountDataThrottling()
+    private lazy var accountDataThrottling = AccountDataThrottling(tunnelManager: tunnelManager)
+
     private var outOfTimeTimer: Timer?
 
     private var appDelegate: AppDelegate {
@@ -44,6 +45,10 @@ class SceneDelegate: UIResponder {
 
     private var restProxyFactory: REST.ProxyFactory {
         return appDelegate.restProxyFactory
+    }
+
+    private var tunnelManager: TunnelManager {
+        return appDelegate.tunnelManager
     }
 
     deinit {
@@ -73,8 +78,8 @@ class SceneDelegate: UIResponder {
 
         window?.makeKeyAndVisible()
 
-        TunnelManager.shared.addObserver(self)
-        if TunnelManager.shared.isConfigurationLoaded {
+        tunnelManager.addObserver(self)
+        if tunnelManager.isConfigurationLoaded {
             configureScene()
         }
     }
@@ -239,23 +244,25 @@ extension SceneDelegate: RootContainerViewControllerDelegate {
     func rootContainerViewAccessibilityPerformMagicTap(_ controller: RootContainerViewController)
         -> Bool
     {
-        guard TunnelManager.shared.deviceState.isLoggedIn else { return false }
+        guard tunnelManager.deviceState.isLoggedIn else { return false }
 
-        switch TunnelManager.shared.tunnelStatus.state {
+        switch tunnelManager.tunnelStatus.state {
         case .connected, .connecting, .reconnecting, .waitingForConnectivity:
-            TunnelManager.shared.reconnectTunnel(selectNewRelay: true)
+            tunnelManager.reconnectTunnel(selectNewRelay: true)
+
         case .disconnecting, .disconnected:
-            TunnelManager.shared.startTunnel()
+            tunnelManager.startTunnel()
+
         case .pendingReconnect:
             break
         }
+
         return true
     }
 }
 
 extension SceneDelegate {
     private func setupPadUI() {
-        let tunnelManager = TunnelManager.shared
         let selectLocationController = makeSelectLocationController()
         let connectController = makeConnectViewController()
 
@@ -282,7 +289,7 @@ extension SceneDelegate {
 
             lazy var viewControllers: [UIViewController] = [self.makeLoginController()]
 
-            switch tunnelManager.deviceState {
+            switch self.tunnelManager.deviceState {
             case .loggedIn:
                 let didDismissModalRoot = {
                     self.handleExpiredAccount()
@@ -354,7 +361,7 @@ extension SceneDelegate {
 
             var viewControllers: [UIViewController] = [self.makeLoginController()]
 
-            switch TunnelManager.shared.deviceState {
+            switch self.tunnelManager.deviceState {
             case .loggedIn:
                 let connectController = self.makeConnectViewController()
                 self.connectController = connectController
@@ -423,7 +430,7 @@ extension SceneDelegate {
             selectLocationController.setCachedRelays(cachedRelays)
         }
 
-        let relayConstraints = TunnelManager.shared.settings.relayConstraints
+        let relayConstraints = tunnelManager.settings.relayConstraints
 
         selectLocationController.setSelectedRelayLocation(
             relayConstraints.location.value,
@@ -465,7 +472,7 @@ extension SceneDelegate {
     }
 
     private func handleExpiredAccount() {
-        guard case let .loggedIn(accountData, _) = TunnelManager.shared.deviceState,
+        guard case let .loggedIn(accountData, _) = tunnelManager.deviceState,
               accountData.expiry <= Date() else { return }
 
         switch UIDevice.current.userInterfaceIdiom {
@@ -599,7 +606,7 @@ extension SceneDelegate: LoginViewControllerDelegate {
     ) {
         setEnableSettingsButton(isEnabled: false, from: controller)
 
-        TunnelManager.shared.setAccount(action: action.setAccountAction) { operationCompletion in
+        tunnelManager.setAccount(action: action.setAccountAction) { operationCompletion in
             switch operationCompletion {
             case .success:
                 // RootContainer's settings button will be re-enabled in
@@ -681,7 +688,7 @@ extension SceneDelegate: LoginViewControllerDelegate {
     private func setUpOutOfTimeTimer() {
         outOfTimeTimer?.invalidate()
 
-        guard case let .loggedIn(accountData, _) = TunnelManager.shared.deviceState,
+        guard case let .loggedIn(accountData, _) = tunnelManager.deviceState,
               accountData.expiry > Date() else { return }
 
         let timer = Timer(
@@ -819,8 +826,8 @@ extension SceneDelegate: SelectLocationViewControllerDelegate {
     private func selectLocationControllerDidSelectRelayLocation(_ relayLocation: RelayLocation) {
         let relayConstraints = RelayConstraints(location: .only(relayLocation))
 
-        TunnelManager.shared.setRelayConstraints(relayConstraints) {
-            TunnelManager.shared.startTunnel()
+        tunnelManager.setRelayConstraints(relayConstraints) {
+            self.tunnelManager.startTunnel()
         }
     }
 }
@@ -829,7 +836,7 @@ extension SceneDelegate: SelectLocationViewControllerDelegate {
 
 extension SceneDelegate: RevokedDeviceViewControllerDelegate {
     func revokedDeviceControllerDidRequestLogout(_ controller: RevokedDeviceViewController) {
-        TunnelManager.shared.unsetAccount { [weak self] in
+        tunnelManager.unsetAccount { [weak self] in
             self?.showLoginViewAfterLogout(dismissController: nil)
         }
     }

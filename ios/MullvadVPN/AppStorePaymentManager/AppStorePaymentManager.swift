@@ -19,9 +19,6 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
         static let productsRequest = "AppStorePaymentManager.productsRequest"
     }
 
-    /// A shared instance of `AppStorePaymentManager`
-    static let shared = AppStorePaymentManager(queue: SKPaymentQueue.default())
-
     private let logger = Logger(label: "AppStorePaymentManager")
 
     private let operationQueue: OperationQueue = {
@@ -30,10 +27,9 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
         return queue
     }()
 
-    private let apiProxy = REST.ProxyFactory.shared.createAPIProxy()
-    private let accountsProxy = REST.ProxyFactory.shared.createAccountsProxy()
-
     private let paymentQueue: SKPaymentQueue
+    private let apiProxy: REST.APIProxy
+    private let accountsProxy: REST.AccountsProxy
     private var observerList = ObserverList<AppStorePaymentObserver>()
 
     private weak var classDelegate: AppStorePaymentManagerDelegate?
@@ -66,8 +62,10 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
         return SKPaymentQueue.canMakePayments()
     }
 
-    init(queue: SKPaymentQueue) {
+    init(queue: SKPaymentQueue, apiProxy: REST.APIProxy, accountsProxy: REST.AccountsProxy) {
         paymentQueue = queue
+        self.apiProxy = apiProxy
+        self.accountsProxy = accountsProxy
     }
 
     func startPaymentQueueMonitoring() {

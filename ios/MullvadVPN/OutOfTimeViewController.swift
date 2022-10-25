@@ -12,6 +12,13 @@ import Operations
 import StoreKit
 import UIKit
 
+protocol SettingsButtonInteractionDelegate: AnyObject {
+    func viewController(
+        _ controller: UIViewController,
+        didRequestSettingsButtonEnabled isEnabled: Bool
+    )
+}
+
 class OutOfTimeViewController: UIViewController {
     weak var delegate: SettingsButtonInteractionDelegate?
 

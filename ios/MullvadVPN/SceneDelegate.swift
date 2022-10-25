@@ -168,13 +168,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 // MARK: - SettingsButtonInteractionDelegate
 
-protocol SettingsButtonInteractionDelegate: AnyObject {
-    func viewController(
-        _ controller: UIViewController,
-        didRequestSettingsButtonEnabled isEnabled: Bool
-    )
-}
-
 extension SceneDelegate: SettingsButtonInteractionDelegate {
     func viewController(
         _ controller: UIViewController,

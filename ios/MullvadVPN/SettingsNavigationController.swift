@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MullvadREST
 import UIKit
 
 enum SettingsNavigationRoute {
@@ -34,9 +35,25 @@ protocol SettingsNavigationControllerDelegate: AnyObject {
     )
 }
 
+class SettingsNavigationInteractor {
+    private let tunnelManager: TunnelManager
+    private let apiProxy: REST.APIProxy
+
+    init(tunnelManager: TunnelManager, apiProxy: REST.APIProxy) {
+        self.tunnelManager = tunnelManager
+        self.apiProxy = apiProxy
+    }
+
+    func makeProblemReportInteractor() -> ProblemReportInteractor {
+        return ProblemReportInteractor(apiProxy: apiProxy, tunnelManager: tunnelManager)
+    }
+}
+
 class SettingsNavigationController: CustomNavigationController, SettingsViewControllerDelegate,
     AccountViewControllerDelegate, UIAdaptivePresentationControllerDelegate
 {
+    private let interactor: SettingsNavigationInteractor
+
     weak var settingsDelegate: SettingsNavigationControllerDelegate?
 
     override var childForStatusBarStyle: UIViewController? {
@@ -47,7 +64,9 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
         return topViewController
     }
 
-    init() {
+    init(interactor: SettingsNavigationInteractor) {
+        self.interactor = interactor
+
         super.init(navigationBarClass: CustomNavigationBar.self, toolbarClass: nil)
 
         navigationBar.prefersLargeTitles = true
@@ -57,7 +76,7 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
     }
 
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func willPop(navigationItem: UINavigationItem) {
@@ -118,7 +137,7 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
             return ShortcutsViewController()
 
         case .problemReport:
-            return ProblemReportViewController()
+            return ProblemReportViewController(interactor: interactor.makeProblemReportInteractor())
         }
     }
 

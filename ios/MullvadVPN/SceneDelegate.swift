@@ -371,7 +371,12 @@ extension SceneDelegate {
     private func makeSettingsNavigationController(route: SettingsNavigationRoute?)
         -> SettingsNavigationController
     {
-        let navController = SettingsNavigationController()
+        let navController = SettingsNavigationController(
+            interactor: SettingsNavigationInteractor(
+                tunnelManager: tunnelManager,
+                apiProxy: apiProxy
+            )
+        )
         navController.settingsDelegate = self
 
         if UIDevice.current.userInterfaceIdiom == .pad {

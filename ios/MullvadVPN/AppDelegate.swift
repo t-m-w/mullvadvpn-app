@@ -34,7 +34,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
 
     private(set) var tunnelManager: TunnelManager!
     private(set) var addressCache: REST.AddressCache!
-    private(set) var restProxyFactory: REST.ProxyFactory!
+
+    private var proxyFactory: REST.ProxyFactory!
+    private(set) var apiProxy: REST.APIProxy!
+    private(set) var accountsProxy: REST.AccountsProxy!
+    private(set) var devicesProxy: REST.DevicesProxy!
+
     private(set) var addressCacheTracker: AddressCacheTracker!
     private(set) var relayCacheTracker: RelayCacheTracker!
     private(set) var storePaymentManager: StorePaymentManager!
@@ -58,10 +63,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
             isReadOnly: false
         )!
 
-        restProxyFactory = REST.ProxyFactory.makeProxyFactory(addressCache: addressCache)
+        proxyFactory = REST.ProxyFactory.makeProxyFactory(addressCache: addressCache)
 
-        let apiProxy = restProxyFactory.createAPIProxy()
-        let accountsProxy = restProxyFactory.createAccountsProxy()
+        apiProxy = proxyFactory.createAPIProxy()
+        accountsProxy = proxyFactory.createAccountsProxy()
+        devicesProxy = proxyFactory.createDevicesProxy()
 
         relayCacheTracker = RelayCacheTracker(apiProxy: apiProxy)
         addressCacheTracker = AddressCacheTracker(
@@ -72,7 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
         tunnelManager = TunnelManager(
             application: application,
             accountsProxy: accountsProxy,
-            devicesProxy: restProxyFactory.createDevicesProxy()
+            devicesProxy: devicesProxy
         )
 
         storePaymentManager = StorePaymentManager(

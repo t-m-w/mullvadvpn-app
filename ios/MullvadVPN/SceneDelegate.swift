@@ -31,9 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private var connectController: ConnectViewController?
     private weak var settingsNavController: SettingsNavigationController?
     private var lastLoginAction: LoginAction?
-    private lazy var accountDataThrottling: AccountDataThrottling = {
-        return AccountDataThrottling(tunnelManager: tunnelManager)
-    }()
+    private lazy var accountDataThrottling = AccountDataThrottling(tunnelManager: tunnelManager)
 
     private var outOfTimeTimer: Timer?
 

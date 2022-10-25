@@ -8,9 +8,55 @@
 
 import MullvadLogging
 import MullvadREST
+import MullvadTypes
 import Operations
 import StoreKit
 import UIKit
+
+final class AccountInteractor {
+    private let storePaymentManager: StorePaymentManager
+    private let tunnelManager: TunnelManager
+
+    init(storePaymentManager: StorePaymentManager, tunnelManager: TunnelManager) {
+        self.storePaymentManager = storePaymentManager
+        self.tunnelManager = tunnelManager
+    }
+
+    var deviceState: DeviceState {
+        return tunnelManager.deviceState
+    }
+
+    func logout(_ completion: @escaping () -> Void) {
+        tunnelManager.unsetAccount(completionHandler: completion)
+    }
+
+    func addPayment(_ payment: SKPayment, for accountNumber: String) {
+        storePaymentManager.addPayment(payment, for: accountNumber)
+    }
+
+    func restorePurchases(
+        for accountNumber: String,
+        completionHandler: @escaping (OperationCompletion<
+            REST.CreateApplePaymentResponse,
+            StorePaymentManager.Error
+        >) -> Void
+    ) -> Cancellable {
+        return storePaymentManager.restorePurchases(
+            for: accountNumber,
+            completionHandler: completionHandler
+        )
+    }
+
+    func requestProducts(
+        with productIdentifiers: Set<StoreSubscription>,
+        completionHandler: @escaping (OperationCompletion<SKProductsResponse, Swift.Error>) -> Void
+    ) -> Cancellable {
+        return storePaymentManager.requestProducts(
+            with: productIdentifiers,
+            completionHandler: completionHandler
+        )
+    }
+}
 
 protocol AccountViewControllerDelegate: AnyObject {
     func accountViewControllerDidLogout(_ controller: AccountViewController)
@@ -29,6 +75,15 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
     private var paymentState: PaymentState = .none
 
     weak var delegate: AccountViewControllerDelegate?
+
+    private let interactor: AccountInteractor
+    init(interactor: AccountInteractor) {
+        self.interactor = interactor
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - View lifecycle
 
@@ -86,7 +141,7 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         StorePaymentManager.shared.addPaymentObserver(self)
         TunnelManager.shared.addObserver(self)
 
-        updateView(from: TunnelManager.shared.deviceState)
+        updateView(from: interactor.deviceState)
         applyViewState(animated: false)
 
         if StorePaymentManager.canMakePayments {
@@ -103,13 +158,12 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
 
         setProductState(.fetching(productKind), animated: true)
 
-        _ = StorePaymentManager.shared
-            .requestProducts(with: [productKind]) { [weak self] completion in
-                let productState: ProductState = completion.value?.products.first
-                    .map { .received($0) } ?? .failed
+        _ = interactor.requestProducts(with: [productKind]) { [weak self] completion in
+            let productState: ProductState = completion.value?.products.first
+                .map { .received($0) } ?? .failed
 
-                self?.setProductState(productState, animated: true)
-            }
+            self?.setProductState(productState, animated: true)
+        }
     }
 
     private func setPaymentState(_ newState: PaymentState, animated: Bool) {
@@ -302,7 +356,7 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         )
 
         alertPresenter.enqueue(alertController, presentingController: self) {
-            TunnelManager.shared.unsetAccount {
+            self.interactor.logout {
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
                     alertController.dismiss(animated: true) {
                         self.delegate?.accountViewControllerDidLogout(self)
@@ -379,7 +433,7 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
     }
 
     private func copyAccountToken() {
-        guard let accountData = TunnelManager.shared.deviceState.accountData else {
+        guard let accountData = interactor.deviceState.accountData else {
             return
         }
 
@@ -388,25 +442,25 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
 
     @objc private func doPurchase() {
         guard case let .received(product) = productState,
-              let accountData = TunnelManager.shared.deviceState.accountData
+              let accountData = interactor.deviceState.accountData
         else {
             return
         }
 
         let payment = SKPayment(product: product)
-        StorePaymentManager.shared.addPayment(payment, for: accountData.number)
+        interactor.addPayment(payment, for: accountData.number)
 
         setPaymentState(.makingPayment(payment), animated: true)
     }
 
     @objc private func restorePurchases() {
-        guard let accountData = TunnelManager.shared.deviceState.accountData else {
+        guard let accountData = interactor.deviceState.accountData else {
             return
         }
 
         setPaymentState(.restoringPurchases, animated: true)
 
-        _ = StorePaymentManager.shared.restorePurchases(for: accountData.number) { completion in
+        _ = interactor.restorePurchases(for: accountData.number) { completion in
             switch completion {
             case let .success(response):
                 self.showTimeAddedConfirmationAlert(with: response, context: .restoration)

@@ -39,6 +39,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
 
+    private var storePaymentManager: StorePaymentManager {
+        return appDelegate.storePaymentManager
+    }
+
     private var relayCacheTracker: RelayCacheTracker {
         return appDelegate.relayCacheTracker
     }
@@ -371,6 +375,7 @@ extension SceneDelegate {
     {
         let navController = SettingsNavigationController(
             interactor: SettingsNavigationInteractor(
+                storePaymentManager: storePaymentManager,
                 tunnelManager: tunnelManager,
                 apiProxy: apiProxy
             )

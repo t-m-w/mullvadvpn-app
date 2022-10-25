@@ -36,12 +36,25 @@ protocol SettingsNavigationControllerDelegate: AnyObject {
 }
 
 class SettingsNavigationInteractor {
+    private let storePaymentManager: StorePaymentManager
     private let tunnelManager: TunnelManager
     private let apiProxy: REST.APIProxy
 
-    init(tunnelManager: TunnelManager, apiProxy: REST.APIProxy) {
+    init(
+        storePaymentManager: StorePaymentManager,
+        tunnelManager: TunnelManager,
+        apiProxy: REST.APIProxy
+    ) {
+        self.storePaymentManager = storePaymentManager
         self.tunnelManager = tunnelManager
         self.apiProxy = apiProxy
+    }
+
+    func makeAccountInteractor() -> AccountInteractor {
+        return AccountInteractor(
+            storePaymentManager: storePaymentManager,
+            tunnelManager: tunnelManager
+        )
     }
 
     func makePreferencesInteractor() -> PreferencesInteractor {
@@ -130,7 +143,7 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
             return settingsController
 
         case .account:
-            let controller = AccountViewController()
+            let controller = AccountViewController(interactor: interactor.makeAccountInteractor())
             controller.delegate = self
             return controller
 

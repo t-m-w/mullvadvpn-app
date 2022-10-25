@@ -44,6 +44,10 @@ class SettingsNavigationInteractor {
         self.apiProxy = apiProxy
     }
 
+    func makePreferencesInteractor() -> PreferencesInteractor {
+        return PreferencesInteractor(tunnelManager: tunnelManager)
+    }
+
     func makeProblemReportInteractor() -> ProblemReportInteractor {
         return ProblemReportInteractor(apiProxy: apiProxy, tunnelManager: tunnelManager)
     }
@@ -131,7 +135,7 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
             return controller
 
         case .preferences:
-            return PreferencesViewController()
+            return PreferencesViewController(interactor: interactor.makePreferencesInteractor())
 
         case .shortcuts:
             return ShortcutsViewController()

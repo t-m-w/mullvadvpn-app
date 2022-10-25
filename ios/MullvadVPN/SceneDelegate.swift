@@ -13,7 +13,7 @@ import Operations
 import RelayCache
 import UIKit
 
-class SceneDelegate: UIResponder {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let logger = Logger(label: "SceneDelegate")
 
     var window: UIWindow?
@@ -31,7 +31,9 @@ class SceneDelegate: UIResponder {
     private var connectController: ConnectViewController?
     private weak var settingsNavController: SettingsNavigationController?
     private var lastLoginAction: LoginAction?
-    private lazy var accountDataThrottling = AccountDataThrottling(tunnelManager: tunnelManager)
+    private lazy var accountDataThrottling: AccountDataThrottling = {
+        return AccountDataThrottling(tunnelManager: tunnelManager)
+    }()
 
     private var outOfTimeTimer: Timer?
 
@@ -43,12 +45,16 @@ class SceneDelegate: UIResponder {
         return appDelegate.relayCacheTracker
     }
 
-    private var restProxyFactory: REST.ProxyFactory {
-        return appDelegate.restProxyFactory
-    }
-
     private var tunnelManager: TunnelManager {
         return appDelegate.tunnelManager
+    }
+
+    private var apiProxy: REST.APIProxy {
+        return appDelegate.apiProxy
+    }
+
+    private var devicesProxy: REST.DevicesProxy {
+        return appDelegate.devicesProxy
     }
 
     deinit {
@@ -65,22 +71,6 @@ class SceneDelegate: UIResponder {
                 .contains(where: { $0 is OutOfTimeViewController })
         default:
             return false
-        }
-    }
-
-    func setupScene(windowFactory: WindowFactory) {
-        window = windowFactory.create()
-        window?.rootViewController = LaunchViewController()
-
-        privacyOverlayWindow = windowFactory.create()
-        privacyOverlayWindow?.rootViewController = LaunchViewController()
-        privacyOverlayWindow?.windowLevel = .alert + 1
-
-        window?.makeKeyAndVisible()
-
-        tunnelManager.addObserver(self)
-        if tunnelManager.isConfigurationLoaded {
-            configureScene()
         }
     }
 
@@ -121,7 +111,35 @@ class SceneDelegate: UIResponder {
         }
     }
 
-    @objc private func sceneDidBecomeActive() {
+    // MARK: - UIWindowSceneDelegate
+
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = LaunchViewController()
+
+        privacyOverlayWindow = UIWindow(windowScene: windowScene)
+        privacyOverlayWindow?.rootViewController = LaunchViewController()
+        privacyOverlayWindow?.windowLevel = .alert + 1
+
+        window?.makeKeyAndVisible()
+
+        tunnelManager.addObserver(self)
+        if tunnelManager.isConfigurationLoaded {
+            configureScene()
+        }
+    }
+
+    func sceneDidDisconnect(_ scene: UIScene) {
+        // no-op
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
         if isSceneConfigured {
             accountDataThrottling.requestUpdate(
                 condition: settingsNavController == nil
@@ -135,36 +153,8 @@ class SceneDelegate: UIResponder {
         setShowsPrivacyOverlay(false)
     }
 
-    @objc private func sceneWillResignActive() {
-        setShowsPrivacyOverlay(true)
-    }
-
-
-}
-
-// MARK: - UIWindowSceneDelegate
-
-extension SceneDelegate: UIWindowSceneDelegate {
-    func scene(
-        _ scene: UIScene,
-        willConnectTo session: UISceneSession,
-        options connectionOptions: UIScene.ConnectionOptions
-    ) {
-        guard let windowScene = scene as? UIWindowScene else { return }
-
-        setupScene(windowFactory: SceneWindowFactory(windowScene: windowScene))
-    }
-
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // no-op
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        sceneDidBecomeActive()
-    }
-
     func sceneWillResignActive(_ scene: UIScene) {
-        sceneWillResignActive()
+        setShowsPrivacyOverlay(true)
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
@@ -620,7 +610,7 @@ extension SceneDelegate: LoginViewControllerDelegate {
                     let deviceController = DeviceManagementViewController(
                         interactor: DeviceManagementInteractor(
                             accountNumber: accountNumber,
-                            devicesProxy: self.restProxyFactory.createDevicesProxy()
+                            devicesProxy: self.devicesProxy
                         )
                     )
                     deviceController.delegate = self
@@ -655,7 +645,7 @@ extension SceneDelegate: LoginViewControllerDelegate {
         rootContainer.removeSettingsButtonFromPresentationContainer()
         setEnableSettingsButton(isEnabled: true, from: controller)
 
-        let relayConstraints = TunnelManager.shared.settings.relayConstraints
+        let relayConstraints = tunnelManager.settings.relayConstraints
         selectLocationViewController?.setSelectedRelayLocation(
             relayConstraints.location.value,
             animated: false,
@@ -977,25 +967,5 @@ extension SceneDelegate: UISplitViewControllerDelegate {
             selectLocationViewController?.dismiss(animated: false)
         }
         return nil
-    }
-}
-
-// MARK: - Window factory
-
-protocol WindowFactory {
-    func create() -> UIWindow
-}
-
-struct ClassicWindowFactory: WindowFactory {
-    func create() -> UIWindow {
-        return UIWindow(frame: UIScreen.main.bounds)
-    }
-}
-
-struct SceneWindowFactory: WindowFactory {
-    let windowScene: UIWindowScene
-
-    func create() -> UIWindow {
-        return UIWindow(windowScene: windowScene)
     }
 }

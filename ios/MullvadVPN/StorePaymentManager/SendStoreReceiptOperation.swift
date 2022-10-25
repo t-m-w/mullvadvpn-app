@@ -1,5 +1,5 @@
 //
-//  SendAppStoreReceiptOperation.swift
+//  SendStoreReceiptOperation.swift
 //  MullvadVPN
 //
 //  Created by pronebird on 29/03/2022.
@@ -12,9 +12,9 @@ import MullvadREST
 import MullvadTypes
 import Operations
 
-class SendAppStoreReceiptOperation: ResultOperation<
+class SendStoreReceiptOperation: ResultOperation<
     REST.CreateApplePaymentResponse,
-    AppStorePaymentManager.Error
+    StorePaymentManager.Error
 > {
     private let apiProxy: REST.APIProxy
     private let accountToken: String
@@ -23,7 +23,7 @@ class SendAppStoreReceiptOperation: ResultOperation<
     private var fetchReceiptTask: Cancellable?
     private var submitReceiptTask: Cancellable?
 
-    private let logger = Logger(label: "SendAppStoreReceiptOperation")
+    private let logger = Logger(label: "SendStoreReceiptOperation")
 
     init(
         apiProxy: REST.APIProxy,

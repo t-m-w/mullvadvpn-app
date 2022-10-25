@@ -80,7 +80,7 @@ private extension OutOfTimeViewController {
     }
 
     func addObservers() {
-        AppStorePaymentManager.shared.addPaymentObserver(self)
+        StorePaymentManager.shared.addPaymentObserver(self)
         TunnelManager.shared.addObserver(self)
     }
 
@@ -116,7 +116,7 @@ private extension OutOfTimeViewController {
 
 private extension OutOfTimeViewController {
     func setUpInAppPurchases() {
-        if AppStorePaymentManager.canMakePayments {
+        if StorePaymentManager.canMakePayments {
             requestStoreProducts()
         } else {
             setProductState(.cannotMakePurchases, animated: false)
@@ -124,11 +124,11 @@ private extension OutOfTimeViewController {
     }
 
     func requestStoreProducts() {
-        let productKind = AppStoreSubscription.thirtyDays
+        let productKind = StoreSubscription.thirtyDays
 
         setProductState(.fetching(productKind), animated: true)
 
-        _ = AppStorePaymentManager.shared
+        _ = StorePaymentManager.shared
             .requestProducts(with: [productKind]) { [weak self] completion in
                 let productState: ProductState = completion.value?.products.first
                     .map { .received($0) } ?? .failed
@@ -200,7 +200,7 @@ private extension OutOfTimeViewController {
         }
 
         let payment = SKPayment(product: product)
-        AppStorePaymentManager.shared.addPayment(payment, for: accountData.number)
+        StorePaymentManager.shared.addPayment(payment, for: accountData.number)
 
         setPaymentState(.makingPayment(payment), animated: true)
     }
@@ -212,7 +212,7 @@ private extension OutOfTimeViewController {
 
         setPaymentState(.restoringPurchases, animated: true)
 
-        _ = AppStorePaymentManager.shared.restorePurchases(for: accountData.number) { completion in
+        _ = StorePaymentManager.shared.restorePurchases(for: accountData.number) { completion in
             switch completion {
             case let .success(response):
                 self.showAlertIfNoTimeAdded(with: response, context: .restoration)
@@ -253,7 +253,7 @@ private extension OutOfTimeViewController {
         alertPresenter.enqueue(alertController, presentingController: self)
     }
 
-    func showRestorePurchasesErrorAlert(error: AppStorePaymentManager.Error) {
+    func showRestorePurchasesErrorAlert(error: StorePaymentManager.Error) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "RESTORE_PURCHASES_FAILURE_ALERT_TITLE",
@@ -275,7 +275,7 @@ private extension OutOfTimeViewController {
         alertPresenter.enqueue(alertController, presentingController: self)
     }
 
-    func showPaymentErrorAlert(error: AppStorePaymentManager.Error) {
+    func showPaymentErrorAlert(error: StorePaymentManager.Error) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "CANNOT_COMPLETE_PURCHASE_ALERT_TITLE",
@@ -309,15 +309,15 @@ private extension OutOfTimeViewController {
     }
 }
 
-// MARK: - AppStorePaymentObserver
+// MARK: - StorePaymentObserver
 
-extension OutOfTimeViewController: AppStorePaymentObserver {
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+extension OutOfTimeViewController: StorePaymentObserver {
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction?,
         payment: SKPayment,
         accountToken: String?,
-        didFailWithError error: AppStorePaymentManager.Error
+        didFailWithError error: StorePaymentManager.Error
     ) {
         switch error {
         case .storePayment(SKError.paymentCancelled):
@@ -330,8 +330,8 @@ extension OutOfTimeViewController: AppStorePaymentObserver {
         didProcessPayment(payment)
     }
 
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction,
         accountToken: String,
         didFinishWithResponse response: REST.CreateApplePaymentResponse
@@ -394,7 +394,7 @@ private extension OutOfTimeViewController {
 
     enum ProductState {
         case none
-        case fetching(AppStoreSubscription)
+        case fetching(StoreSubscription)
         case received(SKProduct)
         case failed
         case cannotMakePurchases

@@ -959,21 +959,21 @@ final class TunnelManager {
     }
 }
 
-// MARK: - AppStore payment observer
+// MARK: - StorePaymentObserver
 
-extension TunnelManager: AppStorePaymentObserver {
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+extension TunnelManager: StorePaymentObserver {
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction?,
         payment: SKPayment,
         accountToken: String?,
-        didFailWithError error: AppStorePaymentManager.Error
+        didFailWithError error: StorePaymentManager.Error
     ) {
         // no-op
     }
 
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction,
         accountToken: String,
         didFinishWithResponse response: REST.CreateApplePaymentResponse

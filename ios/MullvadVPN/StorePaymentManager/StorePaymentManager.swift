@@ -1,5 +1,5 @@
 //
-//  AppStorePaymentManager.swift
+//  StorePaymentManager.swift
 //  MullvadVPN
 //
 //  Created by pronebird on 10/03/2020.
@@ -13,27 +13,27 @@ import MullvadTypes
 import Operations
 import StoreKit
 
-class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
+class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
     private enum OperationCategory {
-        static let sendAppStoreReceipt = "AppStorePaymentManager.sendAppStoreReceipt"
-        static let productsRequest = "AppStorePaymentManager.productsRequest"
+        static let sendStoreReceipt = "StorePaymentManager.sendStoreReceipt"
+        static let productsRequest = "StorePaymentManager.productsRequest"
     }
 
-    private let logger = Logger(label: "AppStorePaymentManager")
+    private let logger = Logger(label: "StorePaymentManager")
 
     private let operationQueue: OperationQueue = {
         let queue = AsyncOperationQueue()
-        queue.name = "AppStorePaymentManagerQueue"
+        queue.name = "StorePaymentManagerQueue"
         return queue
     }()
 
     private let paymentQueue: SKPaymentQueue
     private let apiProxy: REST.APIProxy
     private let accountsProxy: REST.AccountsProxy
-    private var observerList = ObserverList<AppStorePaymentObserver>()
+    private var observerList = ObserverList<StorePaymentObserver>()
 
-    private weak var classDelegate: AppStorePaymentManagerDelegate?
-    weak var delegate: AppStorePaymentManagerDelegate? {
+    private weak var classDelegate: StorePaymentManagerDelegate?
+    weak var delegate: StorePaymentManagerDelegate? {
         get {
             if Thread.isMainThread {
                 return classDelegate
@@ -91,18 +91,18 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
 
     // MARK: - Payment observation
 
-    func addPaymentObserver(_ observer: AppStorePaymentObserver) {
+    func addPaymentObserver(_ observer: StorePaymentObserver) {
         observerList.append(observer)
     }
 
-    func removePaymentObserver(_ observer: AppStorePaymentObserver) {
+    func removePaymentObserver(_ observer: StorePaymentObserver) {
         observerList.remove(observer)
     }
 
     // MARK: - Products and payments
 
     func requestProducts(
-        with productIdentifiers: Set<AppStoreSubscription>,
+        with productIdentifiers: Set<StoreSubscription>,
         completionHandler: @escaping (OperationCompletion<SKProductsResponse, Swift.Error>) -> Void
     ) -> Cancellable {
         let productIdentifiers = productIdentifiers.productIdentifiersSet
@@ -138,7 +138,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
 
             case let .failure(error):
                 self.observerList.forEach { observer in
-                    observer.appStorePaymentManager(
+                    observer.storePaymentManager(
                         self,
                         transaction: nil,
                         payment: payment,
@@ -149,7 +149,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
 
             case .cancelled:
                 self.observerList.forEach { observer in
-                    observer.appStorePaymentManager(
+                    observer.storePaymentManager(
                         self,
                         transaction: nil,
                         payment: payment,
@@ -167,10 +167,10 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
         for accountToken: String,
         completionHandler: @escaping (OperationCompletion<
             REST.CreateApplePaymentResponse,
-            AppStorePaymentManager.Error
+            StorePaymentManager.Error
         >) -> Void
     ) -> Cancellable {
-        return sendAppStoreReceipt(
+        return sendStoreReceipt(
             accountToken: accountToken,
             forceRefresh: true,
             completionHandler: completionHandler
@@ -192,17 +192,17 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
             paymentToAccountToken.removeValue(forKey: payment)
             return accountToken
         } else {
-            return classDelegate?.appStorePaymentManager(self, didRequestAccountTokenFor: payment)
+            return classDelegate?.storePaymentManager(self, didRequestAccountTokenFor: payment)
         }
     }
 
-    private func sendAppStoreReceipt(
+    private func sendStoreReceipt(
         accountToken: String,
         forceRefresh: Bool,
         completionHandler: @escaping (OperationCompletion<REST.CreateApplePaymentResponse, Error>)
             -> Void
     ) -> Cancellable {
-        let operation = SendAppStoreReceiptOperation(
+        let operation = SendStoreReceiptOperation(
             apiProxy: apiProxy,
             accountToken: accountToken,
             forceRefresh: forceRefresh,
@@ -219,7 +219,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
         )
 
         operation.addCondition(
-            MutuallyExclusive(category: OperationCategory.sendAppStoreReceipt)
+            MutuallyExclusive(category: OperationCategory.sendStoreReceipt)
         )
 
         operationQueue.addOperation(operation)
@@ -269,7 +269,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
 
         if let accountToken = deassociateAccountToken(transaction.payment) {
             observerList.forEach { observer in
-                observer.appStorePaymentManager(
+                observer.storePaymentManager(
                     self,
                     transaction: transaction,
                     payment: transaction.payment,
@@ -279,7 +279,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
             }
         } else {
             observerList.forEach { observer in
-                observer.appStorePaymentManager(
+                observer.storePaymentManager(
                     self,
                     transaction: transaction,
                     payment: transaction.payment,
@@ -293,7 +293,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
     private func didFinishOrRestorePurchase(transaction: SKPaymentTransaction) {
         guard let accountToken = deassociateAccountToken(transaction.payment) else {
             observerList.forEach { observer in
-                observer.appStorePaymentManager(
+                observer.storePaymentManager(
                     self,
                     transaction: transaction,
                     payment: transaction.payment,
@@ -304,13 +304,13 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
             return
         }
 
-        _ = sendAppStoreReceipt(accountToken: accountToken, forceRefresh: false) { completion in
+        _ = sendStoreReceipt(accountToken: accountToken, forceRefresh: false) { completion in
             switch completion {
             case let .success(response):
                 self.paymentQueue.finishTransaction(transaction)
 
                 self.observerList.forEach { observer in
-                    observer.appStorePaymentManager(
+                    observer.storePaymentManager(
                         self,
                         transaction: transaction,
                         accountToken: accountToken,
@@ -320,7 +320,7 @@ class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
 
             case let .failure(error):
                 self.observerList.forEach { observer in
-                    observer.appStorePaymentManager(
+                    observer.storePaymentManager(
                         self,
                         transaction: transaction,
                         payment: transaction.payment,

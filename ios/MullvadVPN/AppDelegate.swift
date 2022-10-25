@@ -17,7 +17,7 @@ import UIKit
 import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDelegate,
+class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelegate,
     UNUserNotificationCenterDelegate
 {
     private var logger: Logger!
@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
     private(set) var restProxyFactory: REST.ProxyFactory!
     private(set) var addressCacheTracker: AddressCacheTracker!
     private(set) var relayCacheTracker: RelayCacheTracker!
-    private(set) var storePaymentManager: AppStorePaymentManager!
+    private(set) var storePaymentManager: StorePaymentManager!
     private var transportMonitor: TransportMonitor!
 
     // MARK: - Application lifecycle
@@ -75,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
             devicesProxy: restProxyFactory.createDevicesProxy()
         )
 
-        storePaymentManager = AppStorePaymentManager(
+        storePaymentManager = StorePaymentManager(
             queue: .default(),
             apiProxy: apiProxy,
             accountsProxy: accountsProxy
@@ -353,10 +353,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, AppStorePaymentManagerDel
         UNUserNotificationCenter.current().delegate = self
     }
 
-    // MARK: - AppStorePaymentManagerDelegate
+    // MARK: - StorePaymentManagerDelegate
 
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         didRequestAccountTokenFor payment: SKPayment
     ) -> String? {
         // Since we do not persist the relation between payment and account number between the

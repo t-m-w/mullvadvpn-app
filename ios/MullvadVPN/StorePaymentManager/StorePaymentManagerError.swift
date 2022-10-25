@@ -1,6 +1,6 @@
 //
-//  AppStorePaymentManagerError.swift
-//  AppStorePaymentManagerError
+//  StorePaymentManagerError.swift
+//  MullvadVPN
 //
 //  Created by pronebird on 08/09/2021.
 //  Copyright © 2021 Mullvad VPN AB. All rights reserved.
@@ -10,8 +10,8 @@ import Foundation
 import MullvadREST
 import MullvadTypes
 
-extension AppStorePaymentManager {
-    /// An error type emitted by `AppStorePaymentManager`.
+extension StorePaymentManager {
+    /// An error type emitted by `StorePaymentManager`.
     enum Error: LocalizedError, WrappingError {
         /// Failure to find the account token associated with the transaction.
         case noAccountSet

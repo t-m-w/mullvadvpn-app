@@ -16,7 +16,7 @@ protocol AccountViewControllerDelegate: AnyObject {
     func accountViewControllerDidLogout(_ controller: AccountViewController)
 }
 
-class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelObserver {
+class AccountViewController: UIViewController, StorePaymentObserver, TunnelObserver {
     private let alertPresenter = AlertPresenter()
 
     private let contentView: AccountContentView = {
@@ -83,13 +83,13 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         )
         contentView.logoutButton.addTarget(self, action: #selector(doLogout), for: .touchUpInside)
 
-        AppStorePaymentManager.shared.addPaymentObserver(self)
+        StorePaymentManager.shared.addPaymentObserver(self)
         TunnelManager.shared.addObserver(self)
 
         updateView(from: TunnelManager.shared.deviceState)
         applyViewState(animated: false)
 
-        if AppStorePaymentManager.canMakePayments {
+        if StorePaymentManager.canMakePayments {
             requestStoreProducts()
         } else {
             setProductState(.cannotMakePurchases, animated: false)
@@ -99,11 +99,11 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
     // MARK: - Private methods
 
     private func requestStoreProducts() {
-        let productKind = AppStoreSubscription.thirtyDays
+        let productKind = StoreSubscription.thirtyDays
 
         setProductState(.fetching(productKind), animated: true)
 
-        _ = AppStorePaymentManager.shared
+        _ = StorePaymentManager.shared
             .requestProducts(with: [productKind]) { [weak self] completion in
                 let productState: ProductState = completion.value?.products.first
                     .map { .received($0) } ?? .failed
@@ -165,7 +165,7 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         setPaymentState(.none, animated: true)
     }
 
-    private func showPaymentErrorAlert(error: AppStorePaymentManager.Error) {
+    private func showPaymentErrorAlert(error: StorePaymentManager.Error) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "CANNOT_COMPLETE_PURCHASE_ALERT_TITLE",
@@ -191,7 +191,7 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         alertPresenter.enqueue(alertController, presentingController: self)
     }
 
-    private func showRestorePurchasesErrorAlert(error: AppStorePaymentManager.Error) {
+    private func showRestorePurchasesErrorAlert(error: StorePaymentManager.Error) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "RESTORE_PURCHASES_FAILURE_ALERT_TITLE",
@@ -337,14 +337,14 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         updateView(from: deviceState)
     }
 
-    // MARK: - AppStorePaymentObserver
+    // MARK: - StorePaymentObserver
 
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction?,
         payment: SKPayment,
         accountToken: String?,
-        didFailWithError error: AppStorePaymentManager.Error
+        didFailWithError error: StorePaymentManager.Error
     ) {
         switch error {
         case .storePayment(SKError.paymentCancelled):
@@ -357,8 +357,8 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         didProcessPayment(payment)
     }
 
-    func appStorePaymentManager(
-        _ manager: AppStorePaymentManager,
+    func storePaymentManager(
+        _ manager: StorePaymentManager,
         transaction: SKPaymentTransaction,
         accountToken: String,
         didFinishWithResponse response: REST.CreateApplePaymentResponse
@@ -394,7 +394,7 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
         }
 
         let payment = SKPayment(product: product)
-        AppStorePaymentManager.shared.addPayment(payment, for: accountData.number)
+        StorePaymentManager.shared.addPayment(payment, for: accountData.number)
 
         setPaymentState(.makingPayment(payment), animated: true)
     }
@@ -406,7 +406,7 @@ class AccountViewController: UIViewController, AppStorePaymentObserver, TunnelOb
 
         setPaymentState(.restoringPurchases, animated: true)
 
-        _ = AppStorePaymentManager.shared.restorePurchases(for: accountData.number) { completion in
+        _ = StorePaymentManager.shared.restorePurchases(for: accountData.number) { completion in
             switch completion {
             case let .success(response):
                 self.showTimeAddedConfirmationAlert(with: response, context: .restoration)
@@ -441,7 +441,7 @@ private extension AccountViewController {
 
     enum ProductState {
         case none
-        case fetching(AppStoreSubscription)
+        case fetching(StoreSubscription)
         case received(SKProduct)
         case failed
         case cannotMakePurchases

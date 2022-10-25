@@ -174,6 +174,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
         addressCacheTracker.stopPeriodicUpdates()
     }
 
+    @objc func didEnterBackground(_ notification: Notification) {
+        scheduleBackgroundTasks()
+    }
+
     // MARK: - Background tasks
 
     private func registerBackgroundTasks() {
@@ -251,7 +255,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
         }
     }
 
-    func scheduleBackgroundTasks() {
+    private func scheduleBackgroundTasks() {
         scheduleAppRefreshTask()
         scheduleKeyRotationTask()
         scheduleAddressCacheUpdateTask()
@@ -336,6 +340,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
             self,
             selector: #selector(willResignActive(_:)),
             name: UIApplication.willResignActiveNotification,
+            object: application
+        )
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(didEnterBackground(_:)),
+            name: UIApplication.didEnterBackgroundNotification,
             object: application
         )
     }

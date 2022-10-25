@@ -139,11 +139,7 @@ class SceneDelegate: UIResponder {
         setShowsPrivacyOverlay(true)
     }
 
-    @objc private func sceneDidEnterBackground() {
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
 
-        appDelegate?.scheduleBackgroundTasks()
-    }
 }
 
 // MARK: - UIWindowSceneDelegate
@@ -176,7 +172,7 @@ extension SceneDelegate: UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        sceneDidEnterBackground()
+        // no-op
     }
 }
 

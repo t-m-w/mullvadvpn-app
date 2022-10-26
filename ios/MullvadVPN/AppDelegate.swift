@@ -70,10 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
         devicesProxy = proxyFactory.createDevicesProxy()
 
         relayCacheTracker = RelayCacheTracker(apiProxy: apiProxy)
-        addressCacheTracker = AddressCacheTracker(
-            apiProxy: apiProxy,
-            store: addressCache
-        )
+        addressCacheTracker = AddressCacheTracker(apiProxy: apiProxy, store: addressCache)
 
         tunnelManager = TunnelManager(
             application: application,

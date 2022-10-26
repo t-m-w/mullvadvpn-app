@@ -136,6 +136,7 @@
 		585E820327F3285E00939F0E /* SendStoreReceiptOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585E820227F3285E00939F0E /* SendStoreReceiptOperation.swift */; };
 		5862805422428EF100F5A6E1 /* TranslucentButtonBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5862805322428EF100F5A6E1 /* TranslucentButtonBlurView.swift */; };
 		5867770E29096984006F721F /* OutOfTimeInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867770D29096984006F721F /* OutOfTimeInteractor.swift */; };
+		58677710290975E9006F721F /* SettingsNavigationInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867770F290975E8006F721F /* SettingsNavigationInteractor.swift */; };
 		5868585524054096000B8131 /* AppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5868585424054096000B8131 /* AppButton.swift */; };
 		5868BD33261DCD2600E6027F /* CustomSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5868BD32261DCD2600E6027F /* CustomSplitViewController.swift */; };
 		586A950C290125EE007BAF2B /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B9EB122488ED2100095626 /* AlertPresenter.swift */; };
@@ -623,6 +624,7 @@
 		5862805322428EF100F5A6E1 /* TranslucentButtonBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslucentButtonBlurView.swift; sourceTree = "<group>"; };
 		5866F39B2243B82D00168AE5 /* MullvadVPN.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MullvadVPN.entitlements; sourceTree = "<group>"; };
 		5867770D29096984006F721F /* OutOfTimeInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutOfTimeInteractor.swift; sourceTree = "<group>"; };
+		5867770F290975E8006F721F /* SettingsNavigationInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationInteractor.swift; sourceTree = "<group>"; };
 		5868585424054096000B8131 /* AppButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppButton.swift; sourceTree = "<group>"; };
 		5868BD32261DCD2600E6027F /* CustomSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSplitViewController.swift; sourceTree = "<group>"; };
 		586A95112901321B007BAF2B /* IPv6Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv6Endpoint.swift; sourceTree = "<group>"; };
@@ -1308,6 +1310,7 @@
 				584D26C5270C8741004EA533 /* SettingsDNSTextCell.swift */,
 				580F8B88281A79A7002E0998 /* SettingsManager */,
 				58E6771E24ADFE7800AA26E7 /* SettingsNavigationController.swift */,
+				5867770F290975E8006F721F /* SettingsNavigationInteractor.swift */,
 				584D26C1270C8542004EA533 /* SettingsStaticTextFooterView.swift */,
 				58ACF64A26553C3F00ACE4B7 /* SettingsSwitchCell.swift */,
 				58CCA01122424D11004F3011 /* SettingsViewController.swift */,
@@ -2164,6 +2167,7 @@
 				58EE2E3A272FF814003BFF93 /* SettingsDataSource.swift in Sources */,
 				58421032282E42B000F24E46 /* UpdateDeviceDataOperation.swift in Sources */,
 				5878A27D2909657C0096FC88 /* RevokedDeviceInteractor.swift in Sources */,
+				58677710290975E9006F721F /* SettingsNavigationInteractor.swift in Sources */,
 				5872631D283F755900E14ADF /* IntentHandlers.swift in Sources */,
 				58CCA01222424D11004F3011 /* SettingsViewController.swift in Sources */,
 				580F8B8628197958002E0998 /* DNSSettings.swift in Sources */,

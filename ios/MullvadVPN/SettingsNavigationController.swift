@@ -6,8 +6,6 @@
 //  Copyright © 2020 Mullvad VPN AB. All rights reserved.
 //
 
-import Foundation
-import MullvadREST
 import UIKit
 
 enum SettingsNavigationRoute {
@@ -33,37 +31,6 @@ protocol SettingsNavigationControllerDelegate: AnyObject {
         _ controller: SettingsNavigationController,
         didFinishWithReason reason: SettingsDismissReason
     )
-}
-
-class SettingsNavigationInteractor {
-    private let storePaymentManager: StorePaymentManager
-    private let tunnelManager: TunnelManager
-    private let apiProxy: REST.APIProxy
-
-    init(
-        storePaymentManager: StorePaymentManager,
-        tunnelManager: TunnelManager,
-        apiProxy: REST.APIProxy
-    ) {
-        self.storePaymentManager = storePaymentManager
-        self.tunnelManager = tunnelManager
-        self.apiProxy = apiProxy
-    }
-
-    func makeAccountInteractor() -> AccountInteractor {
-        return AccountInteractor(
-            storePaymentManager: storePaymentManager,
-            tunnelManager: tunnelManager
-        )
-    }
-
-    func makePreferencesInteractor() -> PreferencesInteractor {
-        return PreferencesInteractor(tunnelManager: tunnelManager)
-    }
-
-    func makeProblemReportInteractor() -> ProblemReportInteractor {
-        return ProblemReportInteractor(apiProxy: apiProxy, tunnelManager: tunnelManager)
-    }
 }
 
 class SettingsNavigationController: CustomNavigationController, SettingsViewControllerDelegate,

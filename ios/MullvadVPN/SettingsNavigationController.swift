@@ -105,7 +105,9 @@ class SettingsNavigationController: CustomNavigationController, SettingsViewCont
     private func makeViewController(for route: SettingsNavigationRoute) -> UIViewController {
         switch route {
         case .root:
-            let settingsController = SettingsViewController()
+            let settingsController = SettingsViewController(
+                interactor: interactor.makeSettingsInteractor()
+            )
             settingsController.delegate = self
             return settingsController
 

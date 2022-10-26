@@ -38,4 +38,8 @@ final class SettingsNavigationInteractor {
     func makeProblemReportInteractor() -> ProblemReportInteractor {
         return ProblemReportInteractor(apiProxy: apiProxy, tunnelManager: tunnelManager)
     }
+
+    func makeSettingsInteractor() -> SettingsInteractor {
+        return SettingsInteractor(tunnelManager: tunnelManager)
+    }
 }

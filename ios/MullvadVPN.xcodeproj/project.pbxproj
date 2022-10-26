@@ -138,6 +138,8 @@
 		5867770E29096984006F721F /* OutOfTimeInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867770D29096984006F721F /* OutOfTimeInteractor.swift */; };
 		58677710290975E9006F721F /* SettingsNavigationInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867770F290975E8006F721F /* SettingsNavigationInteractor.swift */; };
 		58677712290976FB006F721F /* SettingsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58677711290976FB006F721F /* SettingsInteractor.swift */; };
+		5867771429097BCD006F721F /* PaymentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867771329097BCD006F721F /* PaymentState.swift */; };
+		5867771629097C5B006F721F /* ProductState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867771529097C5B006F721F /* ProductState.swift */; };
 		5868585524054096000B8131 /* AppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5868585424054096000B8131 /* AppButton.swift */; };
 		5868BD33261DCD2600E6027F /* CustomSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5868BD32261DCD2600E6027F /* CustomSplitViewController.swift */; };
 		586A950C290125EE007BAF2B /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B9EB122488ED2100095626 /* AlertPresenter.swift */; };
@@ -627,6 +629,8 @@
 		5867770D29096984006F721F /* OutOfTimeInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutOfTimeInteractor.swift; sourceTree = "<group>"; };
 		5867770F290975E8006F721F /* SettingsNavigationInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationInteractor.swift; sourceTree = "<group>"; };
 		58677711290976FB006F721F /* SettingsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsInteractor.swift; sourceTree = "<group>"; };
+		5867771329097BCD006F721F /* PaymentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentState.swift; sourceTree = "<group>"; };
+		5867771529097C5B006F721F /* ProductState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductState.swift; sourceTree = "<group>"; };
 		5868585424054096000B8131 /* AppButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppButton.swift; sourceTree = "<group>"; };
 		5868BD32261DCD2600E6027F /* CustomSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSplitViewController.swift; sourceTree = "<group>"; };
 		586A95112901321B007BAF2B /* IPv6Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv6Endpoint.swift; sourceTree = "<group>"; };
@@ -1225,6 +1229,8 @@
 				582AE30F2440A6CA00E6733A /* AccountTokenInput.swift */,
 				5878A27029091CF20096FC88 /* AccountInteractor.swift */,
 				58CCA01722426713004F3011 /* AccountViewController.swift */,
+				5867771329097BCD006F721F /* PaymentState.swift */,
+				5867771529097C5B006F721F /* ProductState.swift */,
 				5868585424054096000B8131 /* AppButton.swift */,
 				58CE5E63224146200008646E /* AppDelegate.swift */,
 				5846226F26E229CD0035F7C2 /* StorePaymentManager */,
@@ -2059,6 +2065,7 @@
 				587B75412668FD7800DEF7E9 /* AccountExpiryNotificationProvider.swift in Sources */,
 				587988C728A2A01F00E3DF54 /* AccountDataThrottling.swift in Sources */,
 				5896CEF226972DEB00B0FAE8 /* AccountContentView.swift in Sources */,
+				5867771429097BCD006F721F /* PaymentState.swift in Sources */,
 				587D96742886D87C00CD8F1C /* DeviceManagementContentView.swift in Sources */,
 				589A454C28DDF5E100565204 /* Swizzle.swift in Sources */,
 				5857F24724C882D700CF6F47 /* SelectLocationNavigationController.swift in Sources */,
@@ -2133,6 +2140,7 @@
 				5878A27729093A4F0096FC88 /* BlockStorePaymentObserver.swift in Sources */,
 				5868585524054096000B8131 /* AppButton.swift in Sources */,
 				58E25F812837BBBB002CFB2C /* SceneDelegate.swift in Sources */,
+				5867771629097C5B006F721F /* ProductState.swift in Sources */,
 				585E820327F3285E00939F0E /* SendStoreReceiptOperation.swift in Sources */,
 				584B17AB27637DE40057F3B8 /* ReconnectTunnelOperation.swift in Sources */,
 				5820676426E771DB00655B05 /* TunnelManagerErrors.swift in Sources */,

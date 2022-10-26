@@ -964,27 +964,17 @@ final class TunnelManager {
 extension TunnelManager: StorePaymentObserver {
     func storePaymentManager(
         _ manager: StorePaymentManager,
-        transaction: SKPaymentTransaction?,
-        payment: SKPayment,
-        accountToken: String?,
-        didFailWithError error: StorePaymentManager.Error
+        didReceiveEvent event: StorePaymentEvent
     ) {
-        // no-op
-    }
+        guard case let .finished(completion) = event else { return }
 
-    func storePaymentManager(
-        _ manager: StorePaymentManager,
-        transaction: SKPaymentTransaction,
-        accountToken: String,
-        didFinishWithResponse response: REST.CreateApplePaymentResponse
-    ) {
         scheduleDeviceStateUpdate(
             taskName: "Update account expiry after in-app purchase",
             modificationBlock: { deviceState in
                 switch deviceState {
                 case .loggedIn(var accountData, let deviceData):
-                    if accountData.number == accountToken {
-                        accountData.expiry = response.newExpiry
+                    if accountData.number == completion.accountNumber {
+                        accountData.expiry = completion.serverResponse.newExpiry
                         deviceState = .loggedIn(accountData, deviceData)
                     }
 

@@ -12,21 +12,29 @@ import Operations
 import StoreKit
 import UIKit
 
-protocol SettingsButtonInteractionDelegate: AnyObject {
-    func viewController(
-        _ controller: UIViewController,
-        didRequestSettingsButtonEnabled isEnabled: Bool
-    )
+protocol OutOfTimeViewControllerDelegate: AnyObject {
+    func outOfTimeViewControllerDidBeginPayment(_ controller: OutOfTimeViewController)
+    func outOfTimeViewControllerDidEndPayment(_ controller: OutOfTimeViewController)
 }
 
 class OutOfTimeViewController: UIViewController, RootContainment {
-    weak var delegate: SettingsButtonInteractionDelegate?
+    weak var delegate: OutOfTimeViewControllerDelegate?
 
     private let interactor: OutOfTimeInteractor
     private let alertPresenter = AlertPresenter()
 
-    private var productState: ProductState = .none
-    private var paymentState: PaymentState = .none
+    private var productState: ProductState = .none {
+        didSet {
+            applyViewState()
+        }
+    }
+
+    private var paymentState: PaymentState = .none {
+        didSet {
+            applyViewState()
+            notifyDelegate(oldValue)
+        }
+    }
 
     private lazy var contentView = OutOfTimeContentView()
 
@@ -34,14 +42,9 @@ class OutOfTimeViewController: UIViewController, RootContainment {
         return .lightContent
     }
 
-    private var tunnelState: TunnelState = .disconnected {
-        didSet {
-            setNeedsHeaderBarStyleAppearanceUpdate()
-            applyViewState(animated: true)
-        }
-    }
-
     var preferredHeaderBarPresentation: HeaderBarPresentation {
+        let tunnelState = interactor.tunnelStatus.state
+
         return HeaderBarPresentation(
             style: tunnelState.isSecured ? .secured : .unsecured,
             showsDivider: false
@@ -95,102 +98,83 @@ class OutOfTimeViewController: UIViewController, RootContainment {
         }
 
         interactor.didReceiveTunnelStatus = { [weak self] tunnelStatus in
-            self?.tunnelState = tunnelStatus.state
+            self?.setNeedsHeaderBarStyleAppearanceUpdate()
         }
-
-        tunnelState = interactor.tunnelStatus.state
 
         if StorePaymentManager.canMakePayments {
             requestStoreProducts()
         } else {
-            setProductState(.cannotMakePurchases, animated: false)
+            productState = .cannotMakePurchases
         }
     }
 
     // MARK: - Private
 
-    private func bodyText(for tunnelState: TunnelState) -> String {
+    private func requestStoreProducts() {
+        let productKind = StoreSubscription.thirtyDays
+
+        productState = .fetching(productKind)
+
+        _ = interactor.requestProducts(with: [productKind]) { [weak self] completion in
+            let productState: ProductState = completion.value?.products.first
+                .map { .received($0) } ?? .failed
+
+            self?.productState = productState
+        }
+    }
+
+    private func applyViewState() {
+        let tunnelState = interactor.tunnelStatus.state
+        let isInteractionEnabled = paymentState.allowsViewInteraction
+        let purchaseButton = contentView.purchaseButton
+
+        let isOutOfTime = interactor.deviceState.accountData.map { $0.expiry < Date() } ?? false
+
+        purchaseButton.setTitle(productState.purchaseButtonTitle, for: .normal)
+        contentView.purchaseButton.isLoading = productState.isFetching
+
+        purchaseButton.isEnabled = productState.isReceived && isInteractionEnabled && !tunnelState
+            .isSecured
+        contentView.restoreButton.isEnabled = isInteractionEnabled
+        contentView.disconnectButton.isEnabled = tunnelState.isSecured
+        contentView.disconnectButton.alpha = tunnelState.isSecured ? 1 : 0
+
         if tunnelState.isSecured {
-            return NSLocalizedString(
+            contentView.bodyLabel.text = NSLocalizedString(
                 "OUT_OF_TIME_BODY_CONNECTED",
                 tableName: "OutOfTime",
                 value: "You have no more VPN time left on this account. To add more, you will need to disconnect and access the Internet with an unsecure connection.",
                 comment: ""
             )
         } else {
-            return NSLocalizedString(
+            contentView.bodyLabel.text = NSLocalizedString(
                 "OUT_OF_TIME_BODY_DISCONNECTED",
                 tableName: "OutOfTime",
                 value: "You have no more VPN time left on this account. Either buy credit on our website or redeem a voucher.",
                 comment: ""
             )
         }
-    }
 
-    private func requestStoreProducts() {
-        let productKind = StoreSubscription.thirtyDays
-
-        setProductState(.fetching(productKind), animated: true)
-
-        _ = interactor.requestProducts(with: [productKind]) { [weak self] completion in
-            let productState: ProductState = completion.value?.products.first
-                .map { .received($0) } ?? .failed
-
-            self?.setProductState(productState, animated: true)
-        }
-    }
-
-    private func setPaymentState(_ newState: PaymentState, animated: Bool) {
-        paymentState = newState
-
-        applyViewState(animated: animated)
-    }
-
-    private func setProductState(_ newState: ProductState, animated: Bool) {
-        productState = newState
-
-        applyViewState(animated: animated)
-    }
-
-    private func applyViewState(animated: Bool) {
-        let isInteractionEnabled = paymentState.allowsViewInteraction
-        let purchaseButton = contentView.purchaseButton
-
-        let isOutOfTime = interactor.deviceState.accountData
-            .map { $0.expiry < Date() } ?? false
-
-        let actions = { [weak self] in
-            guard let self = self else { return }
-
-            purchaseButton.setTitle(self.productState.purchaseButtonTitle, for: .normal)
-            self.contentView.purchaseButton.isLoading = self.productState.isFetching
-
-            purchaseButton.isEnabled = self.productState.isReceived && isInteractionEnabled && !self
-                .tunnelState.isSecured
-            self.contentView.restoreButton.isEnabled = isInteractionEnabled
-            self.contentView.disconnectButton.isEnabled = self.tunnelState.isSecured
-            self.contentView.disconnectButton.alpha = self.tunnelState.isSecured ? 1 : 0
-            self.contentView.bodyLabel.text = self.bodyText(for: self.tunnelState)
-
-            if !isInteractionEnabled {
-                self.contentView.statusActivityView.state = .activity
-            } else {
-                self.contentView.statusActivityView.state = isOutOfTime ? .failure : .success
-            }
-
-            self.delegate?.viewController(
-                self,
-                didRequestSettingsButtonEnabled: isInteractionEnabled
-            )
-        }
-        if animated {
-            UIView.animate(withDuration: 0.25, animations: actions)
+        if !isInteractionEnabled {
+            contentView.statusActivityView.state = .activity
         } else {
-            actions()
+            contentView.statusActivityView.state = isOutOfTime ? .failure : .success
         }
 
         view.isUserInteractionEnabled = isInteractionEnabled
-        isModalInPresentation = !isInteractionEnabled
+    }
+
+    private func notifyDelegate(_ oldPaymentState: PaymentState) {
+        switch (oldPaymentState, paymentState) {
+        case (.none, .makingPayment), (.none, .restoringPurchases):
+            delegate?.outOfTimeViewControllerDidBeginPayment(self)
+
+        case (.makingPayment, .none), (.restoringPurchases, .none):
+            delegate?.outOfTimeViewControllerDidEndPayment(self)
+
+        default:
+            break
+        }
     }
 
     private func didReceivePaymentEvent(_ event: StorePaymentEvent) {
@@ -218,7 +202,7 @@ class OutOfTimeViewController: UIViewController, RootContainment {
         guard case let .makingPayment(pendingPayment) = paymentState,
               pendingPayment == payment else { return }
 
-        setPaymentState(.none, animated: true)
+        paymentState = .none
     }
 
     private func showPaymentErrorAlert(error: StorePaymentManagerError) {
@@ -310,7 +294,7 @@ class OutOfTimeViewController: UIViewController, RootContainment {
         let payment = SKPayment(product: product)
         interactor.addPayment(payment, for: accountData.number)
 
-        setPaymentState(.makingPayment(payment), animated: true)
+        paymentState = .makingPayment(payment)
     }
 
     @objc func restorePurchases() {
@@ -318,12 +302,15 @@ class OutOfTimeViewController: UIViewController, RootContainment {
             return
         }
 
-        setPaymentState(.restoringPurchases, animated: true)
+        paymentState = .restoringPurchases
 
-        _ = interactor.restorePurchases(for: accountData.number) { completion in
+        _ = interactor.restorePurchases(for: accountData.number) { [weak self] completion in
+            guard let self = self else { return }
+
             switch completion {
             case let .success(response):
                 self.showAlertIfNoTimeAdded(with: response, context: .restoration)
+
             case let .failure(error):
                 self.showRestorePurchasesErrorAlert(error: error)
 
@@ -331,7 +318,7 @@ class OutOfTimeViewController: UIViewController, RootContainment {
                 break
             }
 
-            self.setPaymentState(.none, animated: true)
+            self.paymentState = .none
         }
     }
 

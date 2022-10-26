@@ -168,14 +168,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 }
 
-// MARK: - SettingsButtonInteractionDelegate
+// MARK: - OutOfTimeViewControllerDelegate
 
-extension SceneDelegate: SettingsButtonInteractionDelegate {
-    func viewController(
-        _ controller: UIViewController,
-        didRequestSettingsButtonEnabled isEnabled: Bool
-    ) {
-        setEnableSettingsButton(isEnabled: isEnabled, from: controller)
+extension SceneDelegate: OutOfTimeViewControllerDelegate {
+    func outOfTimeViewControllerDidBeginPayment(_ controller: OutOfTimeViewController) {
+        setEnableSettingsButton(isEnabled: false, from: controller)
+    }
+
+    func outOfTimeViewControllerDidEndPayment(_ controller: OutOfTimeViewController) {
+        setEnableSettingsButton(isEnabled: true, from: controller)
     }
 }
 

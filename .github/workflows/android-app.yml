@@ -1,4 +1,6 @@
 name: Android - Build and test
+env:
+  CONTAINER_IMAGE: ghcr.io/mullvad/mullvadvpn-app-build-android@sha256:2efed8ce625375c3e60574bb4d35b0d80d7100ae8b5773d144812c7680ac247b
 on:
     # Build whenever a file that affects Android is changed in a pull request
     pull_request:
@@ -22,11 +24,16 @@ on:
             - update-version-metadata.sh
     # Build if requested manually from the Actions tab
     workflow_dispatch:
+      inputs:
+        override_container_image:
+          description: 'Override container image'
+          type: string
+          required: false
 jobs:
     build:
         runs-on: ubuntu-latest
         container:
-          image: ghcr.io/mullvad/mullvadvpn-app-build-android@sha256:2efed8ce625375c3e60574bb4d35b0d80d7100ae8b5773d144812c7680ac247b
+          image: ${{ inputs.override_container_image || env.CONTAINER_IMAGE }}
         steps:
             # Fix for HOME path overridden by GH runners when building in containers, see:
             # https://github.com/actions/runner/issues/863

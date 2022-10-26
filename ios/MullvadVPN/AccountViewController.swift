@@ -175,14 +175,12 @@ class AccountViewController: UIViewController {
     }
 
     private func didReceivePaymentEvent(_ event: StorePaymentEvent) {
+        guard case let .makingPayment(payment) = paymentState,
+              payment == event.payment else { return }
+
         switch event {
         case let .finished(completion):
-            guard case let .makingPayment(payment) = paymentState,
-                  payment == completion.transaction.payment else { return }
-
             showTimeAddedConfirmationAlert(with: completion.serverResponse, context: .purchase)
-
-            didProcessPayment(payment)
 
         case let .failure(paymentFailure):
             switch paymentFailure.error {
@@ -192,9 +190,9 @@ class AccountViewController: UIViewController {
             default:
                 showPaymentErrorAlert(error: paymentFailure.error)
             }
-
-            didProcessPayment(paymentFailure.payment)
         }
+
+        didProcessPayment(payment)
     }
 
     private func didProcessPayment(_ payment: SKPayment) {

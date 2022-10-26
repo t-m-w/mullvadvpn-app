@@ -13,6 +13,15 @@ import StoreKit
 enum StorePaymentEvent {
     case finished(StorePaymentCompletion)
     case failure(StorePaymentFailure)
+
+    var payment: SKPayment {
+        switch self {
+        case let .finished(completion):
+            return completion.transaction.payment
+        case let .failure(failure):
+            return failure.payment
+        }
+    }
 }
 
 struct StorePaymentCompletion {

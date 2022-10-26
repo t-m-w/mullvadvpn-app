@@ -12,6 +12,7 @@ import MullvadREST
 import MullvadTypes
 import NetworkExtension
 import Operations
+import RelayCache
 import RelaySelector
 import StoreKit
 import TunnelProviderMessaging
@@ -49,6 +50,7 @@ final class TunnelManager {
     // MARK: - Internal variables
 
     private let application: UIApplication
+    fileprivate let relayCacheTracker: RelayCacheTracker
     private let accountsProxy: REST.AccountsProxy
     private let devicesProxy: REST.DevicesProxy
 
@@ -82,10 +84,12 @@ final class TunnelManager {
 
     init(
         application: UIApplication,
+        relayCacheTracker: RelayCacheTracker,
         accountsProxy: REST.AccountsProxy,
         devicesProxy: REST.DevicesProxy
     ) {
         self.application = application
+        self.relayCacheTracker = relayCacheTracker
         self.accountsProxy = accountsProxy
         self.devicesProxy = devicesProxy
         self.operationQueue.name = "TunnelManager.operationQueue"
@@ -992,6 +996,10 @@ private struct TunnelInteractorProxy: TunnelInteractor {
 
     init(_ tunnelManager: TunnelManager) {
         self.tunnelManager = tunnelManager
+    }
+
+    func getCachedRelays() throws -> CachedRelays {
+        return try tunnelManager.relayCacheTracker.getCachedRelays()
     }
 
     var tunnel: Tunnel? {

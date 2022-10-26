@@ -77,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, StorePaymentManagerDelega
 
         tunnelManager = TunnelManager(
             application: application,
+            relayCacheTracker: relayCacheTracker,
             accountsProxy: accountsProxy,
             devicesProxy: devicesProxy
         )

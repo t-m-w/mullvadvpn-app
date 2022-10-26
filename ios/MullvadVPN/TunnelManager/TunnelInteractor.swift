@@ -7,8 +7,13 @@
 //
 
 import Foundation
+import RelayCache
 
 protocol TunnelInteractor {
+    // MARK: - Relay cache
+
+    func getCachedRelays() throws -> CachedRelays
+
     // MARK: - Tunnel manipulation
 
     var tunnel: Tunnel? { get }

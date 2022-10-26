@@ -403,7 +403,9 @@ extension SceneDelegate {
     }
 
     private func makeConnectViewController() -> ConnectViewController {
-        let connectController = ConnectViewController()
+        let connectController = ConnectViewController(
+            interactor: ConnectInteractor(tunnelManager: tunnelManager)
+        )
         connectController.delegate = self
 
         return connectController

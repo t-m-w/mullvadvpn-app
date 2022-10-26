@@ -14,7 +14,7 @@ import Operations
 
 class SendStoreReceiptOperation: ResultOperation<
     REST.CreateApplePaymentResponse,
-    StorePaymentManager.Error
+    StorePaymentManagerError
 > {
     private let apiProxy: REST.APIProxy
     private let accountToken: String

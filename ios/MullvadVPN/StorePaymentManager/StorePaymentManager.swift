@@ -137,25 +137,31 @@ class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
                 self.paymentQueue.add(payment)
 
             case let .failure(error):
-                self.observerList.forEach { observer in
-                    observer.storePaymentManager(
-                        self,
+                let event = StorePaymentEvent.failure(
+                    StorePaymentFailure(
                         transaction: nil,
                         payment: payment,
-                        accountToken: accountToken,
-                        didFailWithError: .validateAccount(error)
+                        accountNumber: accountToken,
+                        error: .validateAccount(error)
                     )
+                )
+
+                self.observerList.forEach { observer in
+                    observer.storePaymentManager(self, didReceiveEvent: event)
                 }
 
             case .cancelled:
-                self.observerList.forEach { observer in
-                    observer.storePaymentManager(
-                        self,
+                let event = StorePaymentEvent.failure(
+                    StorePaymentFailure(
                         transaction: nil,
                         payment: payment,
-                        accountToken: accountToken,
-                        didFailWithError: .validateAccount(.network(URLError(.cancelled)))
+                        accountNumber: accountToken,
+                        error: .validateAccount(.network(URLError(.cancelled)))
                     )
+                )
+
+                self.observerList.forEach { observer in
+                    observer.storePaymentManager(self, didReceiveEvent: event)
                 }
             }
 
@@ -167,7 +173,7 @@ class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
         for accountToken: String,
         completionHandler: @escaping (OperationCompletion<
             REST.CreateApplePaymentResponse,
-            StorePaymentManager.Error
+            StorePaymentManagerError
         >) -> Void
     ) -> Cancellable {
         return sendStoreReceipt(
@@ -199,7 +205,10 @@ class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
     private func sendStoreReceipt(
         accountToken: String,
         forceRefresh: Bool,
-        completionHandler: @escaping (OperationCompletion<REST.CreateApplePaymentResponse, Error>)
+        completionHandler: @escaping (OperationCompletion<
+            REST.CreateApplePaymentResponse,
+            StorePaymentManagerError
+        >)
             -> Void
     ) -> Cancellable {
         let operation = SendStoreReceiptOperation(
@@ -268,38 +277,47 @@ class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
         paymentQueue.finishTransaction(transaction)
 
         if let accountToken = deassociateAccountToken(transaction.payment) {
-            observerList.forEach { observer in
-                observer.storePaymentManager(
-                    self,
+            let event = StorePaymentEvent.failure(
+                StorePaymentFailure(
                     transaction: transaction,
                     payment: transaction.payment,
-                    accountToken: accountToken,
-                    didFailWithError: .storePayment(transaction.error!)
+                    accountNumber: accountToken,
+                    error: .storePayment(transaction.error!)
                 )
+            )
+
+            observerList.forEach { observer in
+                observer.storePaymentManager(self, didReceiveEvent: event)
             }
         } else {
-            observerList.forEach { observer in
-                observer.storePaymentManager(
-                    self,
+            let event = StorePaymentEvent.failure(
+                StorePaymentFailure(
                     transaction: transaction,
                     payment: transaction.payment,
-                    accountToken: nil,
-                    didFailWithError: .noAccountSet
+                    accountNumber: nil,
+                    error: .noAccountSet
                 )
+            )
+
+            observerList.forEach { observer in
+                observer.storePaymentManager(self, didReceiveEvent: event)
             }
         }
     }
 
     private func didFinishOrRestorePurchase(transaction: SKPaymentTransaction) {
         guard let accountToken = deassociateAccountToken(transaction.payment) else {
-            observerList.forEach { observer in
-                observer.storePaymentManager(
-                    self,
+            let event = StorePaymentEvent.failure(
+                StorePaymentFailure(
                     transaction: transaction,
                     payment: transaction.payment,
-                    accountToken: nil,
-                    didFailWithError: .noAccountSet
+                    accountNumber: nil,
+                    error: .noAccountSet
                 )
+            )
+
+            observerList.forEach { observer in
+                observer.storePaymentManager(self, didReceiveEvent: event)
             }
             return
         }
@@ -309,24 +327,26 @@ class StorePaymentManager: NSObject, SKPaymentTransactionObserver {
             case let .success(response):
                 self.paymentQueue.finishTransaction(transaction)
 
+                let event = StorePaymentEvent.finished(StorePaymentCompletion(
+                    transaction: transaction,
+                    accountNumber: accountToken,
+                    serverResponse: response
+                ))
+
                 self.observerList.forEach { observer in
-                    observer.storePaymentManager(
-                        self,
-                        transaction: transaction,
-                        accountToken: accountToken,
-                        didFinishWithResponse: response
-                    )
+                    observer.storePaymentManager(self, didReceiveEvent: event)
                 }
 
             case let .failure(error):
+                let event = StorePaymentEvent.failure(StorePaymentFailure(
+                    transaction: transaction,
+                    payment: transaction.payment,
+                    accountNumber: accountToken,
+                    error: error
+                ))
+
                 self.observerList.forEach { observer in
-                    observer.storePaymentManager(
-                        self,
-                        transaction: transaction,
-                        payment: transaction.payment,
-                        accountToken: accountToken,
-                        didFailWithError: error
-                    )
+                    observer.storePaymentManager(self, didReceiveEvent: event)
                 }
 
             case .cancelled:

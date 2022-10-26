@@ -107,7 +107,7 @@ extension SKError: LocalizedError {
     }
 }
 
-extension StorePaymentManager.Error: DisplayChainedError {
+extension StorePaymentManagerError: DisplayChainedError {
     var errorChainDescription: String? {
         switch self {
         case .noAccountSet:

@@ -387,7 +387,9 @@ class AccountViewController: UIViewController {
 
         setPaymentState(.restoringPurchases, animated: true)
 
-        _ = interactor.restorePurchases(for: accountData.number) { completion in
+        _ = interactor.restorePurchases(for: accountData.number) { [weak self] completion in
+            guard let self = self else { return }
+
             switch completion {
             case let .success(response):
                 self.showTimeAddedConfirmationAlert(with: response, context: .restoration)

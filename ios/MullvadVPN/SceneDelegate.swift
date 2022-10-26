@@ -397,7 +397,12 @@ extension SceneDelegate {
     }
 
     private func makeOutOfTimeViewController() -> OutOfTimeViewController {
-        let viewController = OutOfTimeViewController()
+        let viewController = OutOfTimeViewController(
+            interactor: OutOfTimeInteractor(
+                storePaymentManager: storePaymentManager,
+                tunnelManager: tunnelManager
+            )
+        )
         viewController.delegate = self
         return viewController
     }

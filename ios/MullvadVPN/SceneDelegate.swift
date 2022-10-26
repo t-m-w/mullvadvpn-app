@@ -447,7 +447,9 @@ extension SceneDelegate {
     }
 
     private func makeRevokedDeviceController() -> RevokedDeviceViewController {
-        let controller = RevokedDeviceViewController()
+        let controller = RevokedDeviceViewController(
+            interactor: RevokedDeviceInteractor(tunnelManager: tunnelManager)
+        )
         controller.delegate = self
         return controller
     }

@@ -13,56 +13,12 @@ import Operations
 import StoreKit
 import UIKit
 
-final class AccountInteractor {
-    private let storePaymentManager: StorePaymentManager
-    private let tunnelManager: TunnelManager
-
-    init(storePaymentManager: StorePaymentManager, tunnelManager: TunnelManager) {
-        self.storePaymentManager = storePaymentManager
-        self.tunnelManager = tunnelManager
-    }
-
-    var deviceState: DeviceState {
-        return tunnelManager.deviceState
-    }
-
-    func logout(_ completion: @escaping () -> Void) {
-        tunnelManager.unsetAccount(completionHandler: completion)
-    }
-
-    func addPayment(_ payment: SKPayment, for accountNumber: String) {
-        storePaymentManager.addPayment(payment, for: accountNumber)
-    }
-
-    func restorePurchases(
-        for accountNumber: String,
-        completionHandler: @escaping (OperationCompletion<
-            REST.CreateApplePaymentResponse,
-            StorePaymentManager.Error
-        >) -> Void
-    ) -> Cancellable {
-        return storePaymentManager.restorePurchases(
-            for: accountNumber,
-            completionHandler: completionHandler
-        )
-    }
-
-    func requestProducts(
-        with productIdentifiers: Set<StoreSubscription>,
-        completionHandler: @escaping (OperationCompletion<SKProductsResponse, Swift.Error>) -> Void
-    ) -> Cancellable {
-        return storePaymentManager.requestProducts(
-            with: productIdentifiers,
-            completionHandler: completionHandler
-        )
-    }
-}
-
 protocol AccountViewControllerDelegate: AnyObject {
     func accountViewControllerDidLogout(_ controller: AccountViewController)
 }
 
-class AccountViewController: UIViewController, StorePaymentObserver, TunnelObserver {
+class AccountViewController: UIViewController {
+    private let interactor: AccountInteractor
     private let alertPresenter = AlertPresenter()
 
     private let contentView: AccountContentView = {
@@ -76,9 +32,10 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
 
     weak var delegate: AccountViewControllerDelegate?
 
-    private let interactor: AccountInteractor
     init(interactor: AccountInteractor) {
         self.interactor = interactor
+
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -138,8 +95,13 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         )
         contentView.logoutButton.addTarget(self, action: #selector(doLogout), for: .touchUpInside)
 
-        StorePaymentManager.shared.addPaymentObserver(self)
-        TunnelManager.shared.addObserver(self)
+        interactor.didReceiveDeviceState = { [weak self] newDeviceState in
+            self?.updateView(from: newDeviceState)
+        }
+
+        interactor.didReceivePaymentEvent = { [weak self] event in
+            self?.didReceivePaymentEvent(event)
+        }
 
         updateView(from: interactor.deviceState)
         applyViewState(animated: false)
@@ -212,6 +174,29 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         navigationItem.setHidesBackButton(!isInteractionEnabled, animated: animated)
     }
 
+    private func didReceivePaymentEvent(_ event: StorePaymentEvent) {
+        switch event {
+        case let .finished(completion):
+            guard case let .makingPayment(payment) = paymentState,
+                  payment == completion.transaction.payment else { return }
+
+            showTimeAddedConfirmationAlert(with: completion.serverResponse, context: .purchase)
+
+            didProcessPayment(payment)
+
+        case let .failure(paymentFailure):
+            switch paymentFailure.error {
+            case .storePayment(SKError.paymentCancelled):
+                break
+
+            default:
+                showPaymentErrorAlert(error: paymentFailure.error)
+            }
+
+            didProcessPayment(paymentFailure.payment)
+        }
+    }
+
     private func didProcessPayment(_ payment: SKPayment) {
         guard case let .makingPayment(pendingPayment) = paymentState,
               pendingPayment == payment else { return }
@@ -219,7 +204,7 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         setPaymentState(.none, animated: true)
     }
 
-    private func showPaymentErrorAlert(error: StorePaymentManager.Error) {
+    private func showPaymentErrorAlert(error: StorePaymentManagerError) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "CANNOT_COMPLETE_PURCHASE_ALERT_TITLE",
@@ -245,7 +230,7 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         alertPresenter.enqueue(alertController, presentingController: self)
     }
 
-    private func showRestorePurchasesErrorAlert(error: StorePaymentManager.Error) {
+    private func showRestorePurchasesErrorAlert(error: StorePaymentManagerError) {
         let alertController = UIAlertController(
             title: NSLocalizedString(
                 "RESTORE_PURCHASES_FAILURE_ALERT_TITLE",
@@ -366,62 +351,6 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
         }
     }
 
-    // MARK: - TunnelObserver
-
-    func tunnelManagerDidLoadConfiguration(_ manager: TunnelManager) {
-        // no-op
-    }
-
-    func tunnelManager(_ manager: TunnelManager, didUpdateTunnelStatus tunnelStatus: TunnelStatus) {
-        // no-op
-    }
-
-    func tunnelManager(_ manager: TunnelManager, didFailWithError error: Error) {
-        // no-op
-    }
-
-    func tunnelManager(
-        _ manager: TunnelManager,
-        didUpdateTunnelSettings tunnelSettings: TunnelSettingsV2
-    ) {
-        // no-op
-    }
-
-    func tunnelManager(_ manager: TunnelManager, didUpdateDeviceState deviceState: DeviceState) {
-        updateView(from: deviceState)
-    }
-
-    // MARK: - StorePaymentObserver
-
-    func storePaymentManager(
-        _ manager: StorePaymentManager,
-        transaction: SKPaymentTransaction?,
-        payment: SKPayment,
-        accountToken: String?,
-        didFailWithError error: StorePaymentManager.Error
-    ) {
-        switch error {
-        case .storePayment(SKError.paymentCancelled):
-            break
-
-        default:
-            showPaymentErrorAlert(error: error)
-        }
-
-        didProcessPayment(payment)
-    }
-
-    func storePaymentManager(
-        _ manager: StorePaymentManager,
-        transaction: SKPaymentTransaction,
-        accountToken: String,
-        didFinishWithResponse response: REST.CreateApplePaymentResponse
-    ) {
-        showTimeAddedConfirmationAlert(with: response, context: .purchase)
-
-        didProcessPayment(transaction.payment)
-    }
-
     // MARK: - Actions
 
     @objc private func doLogout() {
@@ -475,10 +404,8 @@ class AccountViewController: UIViewController, StorePaymentObserver, TunnelObser
             self.setPaymentState(.none, animated: true)
         }
     }
-}
 
-private extension AccountViewController {
-    enum PaymentState: Equatable {
+    private enum PaymentState: Equatable {
         case none
         case makingPayment(SKPayment)
         case restoringPurchases
@@ -493,7 +420,7 @@ private extension AccountViewController {
         }
     }
 
-    enum ProductState {
+    private enum ProductState {
         case none
         case fetching(StoreSubscription)
         case received(SKProduct)

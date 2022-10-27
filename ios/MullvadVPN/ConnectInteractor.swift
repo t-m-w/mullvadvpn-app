@@ -26,7 +26,7 @@ final class ConnectInteractor {
     init(tunnelManager: TunnelManager) {
         self.tunnelManager = tunnelManager
 
-        let tunnelObserver = BlockTunnelObserver(
+        let tunnelObserver = TunnelBlockObserver(
             didUpdateTunnelStatus: { [weak self] tunnelManager, tunnelStatus in
                 self?.didUpdateTunnelStatus?(tunnelStatus)
             },

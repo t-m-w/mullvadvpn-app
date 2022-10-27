@@ -26,7 +26,7 @@ final class OutOfTimeInteractor {
         self.storePaymentManager = storePaymentManager
         self.tunnelManager = tunnelManager
 
-        let tunnelObserver = BlockTunnelObserver(
+        let tunnelObserver = TunnelBlockObserver(
             didUpdateTunnelStatus: { [weak self] manager, tunnelStatus in
                 self?.didReceiveTunnelStatus?(tunnelStatus)
             }

@@ -1,5 +1,5 @@
 //
-//  BlockTunnelObserver.swift
+//  TunnelBlockObserver.swift
 //  MullvadVPN
 //
 //  Created by pronebird on 26/10/2022.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class BlockTunnelObserver: TunnelObserver {
+final class TunnelBlockObserver: TunnelObserver {
     typealias DidLoadConfigurationHandler = (TunnelManager) -> Void
     typealias DidUpdateTunnelStatusHandler = (TunnelManager, TunnelStatus) -> Void
     typealias DidUpdateDeviceStateHandler = (TunnelManager, DeviceState) -> Void

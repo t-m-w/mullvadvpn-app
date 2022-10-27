@@ -144,7 +144,7 @@ extension StorePaymentManagerError: DisplayChainedError {
             }
 
         case let .readReceipt(readReceiptError):
-            if readReceiptError is AppStoreReceiptNotFound {
+            if readReceiptError is StoreReceiptNotFound {
                 return NSLocalizedString(
                     "RECEIPT_NOT_FOUND_ERROR",
                     tableName: "StorePaymentManager",

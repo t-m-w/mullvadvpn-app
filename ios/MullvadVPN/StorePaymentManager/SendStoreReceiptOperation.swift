@@ -53,7 +53,7 @@ class SendStoreReceiptOperation: ResultOperation<
     }
 
     override func main() {
-        fetchReceiptTask = AppStoreReceipt.fetch(
+        fetchReceiptTask = StoreReceipt.fetch(
             forceRefresh: forceRefresh,
             receiptProperties: receiptProperties
         ) { completion in
@@ -82,10 +82,13 @@ class SendStoreReceiptOperation: ResultOperation<
         ) { result in
             switch result {
             case let .success(response):
-                self.logger
-                    .info(
-                        "AppStore receipt was processed. Time added: \(response.timeAdded), New expiry: \(response.newExpiry.logFormatDate())"
-                    )
+                self.logger.info(
+                    """
+                    AppStore receipt was processed. \
+                    Time added: \(response.timeAdded), \
+                    New expiry: \(response.newExpiry.logFormatDate())
+                    """
+                )
                 self.finish(completion: .success(response))
 
             case let .failure(error):

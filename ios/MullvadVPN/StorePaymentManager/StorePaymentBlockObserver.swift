@@ -1,5 +1,5 @@
 //
-//  BlockStorePaymentObserver.swift
+//  StorePaymentBlockObserver.swift
 //  MullvadVPN
 //
 //  Created by pronebird on 26/10/2022.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class BlockStorePaymentObserver: StorePaymentObserver {
+final class StorePaymentBlockObserver: StorePaymentObserver {
     typealias BlockHandler = (StorePaymentManager, StorePaymentEvent) -> Void
 
     private let blockHandler: BlockHandler

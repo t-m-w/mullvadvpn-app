@@ -293,20 +293,20 @@ extension REST {
 
         private func refreshAddresses() {
             do {
-                var readResult = try readFromCacheLocation()
+                let readResult = try readFromCacheLocation()
+                var newCachedAddresses = readResult.cachedAddresses
 
-                guard Set(readResult.cachedAddresses.endpoints) != Set(cachedAddresses.endpoints)
+                guard Set(newCachedAddresses.endpoints) != Set(cachedAddresses.endpoints)
                 else { return }
 
                 // Move current endpoint to the top of the list
                 let currentEndpoint = cachedAddresses.endpoints.first!
-                if let index = readResult.cachedAddresses.endpoints.firstIndex(of: currentEndpoint)
-                {
-                    readResult.cachedAddresses.endpoints.remove(at: index)
-                    readResult.cachedAddresses.endpoints.insert(currentEndpoint, at: 0)
+                if let index = newCachedAddresses.endpoints.firstIndex(of: currentEndpoint) {
+                    newCachedAddresses.endpoints.remove(at: index)
+                    newCachedAddresses.endpoints.insert(currentEndpoint, at: 0)
                 }
 
-                cachedAddresses = readResult.cachedAddresses
+                cachedAddresses = newCachedAddresses
             } catch {
                 logger.error(error: error, message: "Failed to refresh address cache from disk.")
             }

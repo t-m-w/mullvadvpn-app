@@ -32,7 +32,7 @@ final class OutOfTimeInteractor {
             }
         )
 
-        let paymentObserver = BlockStorePaymentObserver { [weak self] manager, event in
+        let paymentObserver = StorePaymentBlockObserver { [weak self] manager, event in
             self?.didReceivePaymentEvent?(event)
         }
 

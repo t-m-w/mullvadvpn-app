@@ -137,9 +137,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // no-op
-    }
+    func sceneDidDisconnect(_ scene: UIScene) {}
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         if isSceneConfigured {
@@ -159,13 +157,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         setShowsPrivacyOverlay(true)
     }
 
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // no-op
-    }
+    func sceneWillEnterForeground(_ scene: UIScene) {}
 
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // no-op
-    }
+    func sceneDidEnterBackground(_ scene: UIScene) {}
 }
 
 // MARK: - OutOfTimeViewControllerDelegate

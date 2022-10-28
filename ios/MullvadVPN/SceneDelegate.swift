@@ -103,39 +103,6 @@ class SceneDelegate: UIResponder {
             window?.makeKeyAndVisible()
         }
     }
-
-    @objc private func sceneDidBecomeActive() {
-        TunnelManager.shared.refreshTunnelStatus()
-
-        if isSceneConfigured {
-            accountDataThrottling.requestUpdate(
-                condition: settingsNavController == nil
-                    ? .whenCloseToExpiryAndBeyond
-                    : .always
-            )
-        }
-
-        RelayCacheTracker.shared.startPeriodicUpdates()
-        TunnelManager.shared.startPeriodicPrivateKeyRotation()
-        AddressCacheTracker.shared.startPeriodicUpdates()
-        ShortcutsManager.shared.updateVoiceShortcuts()
-
-        setShowsPrivacyOverlay(false)
-    }
-
-    @objc private func sceneWillResignActive() {
-        RelayCacheTracker.shared.stopPeriodicUpdates()
-        TunnelManager.shared.stopPeriodicPrivateKeyRotation()
-        AddressCacheTracker.shared.stopPeriodicUpdates()
-
-        setShowsPrivacyOverlay(true)
-    }
-
-    @objc private func sceneDidEnterBackground() {
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-
-        appDelegate?.scheduleBackgroundTasks()
-    }
 }
 
 // MARK: - UIWindowSceneDelegate
@@ -156,20 +123,26 @@ extension SceneDelegate: UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        sceneDidBecomeActive()
+        if isSceneConfigured {
+            accountDataThrottling.requestUpdate(
+                condition: settingsNavController == nil
+                    ? .whenCloseToExpiryAndBeyond
+                    : .always
+            )
+        }
+
+        ShortcutsManager.shared.updateVoiceShortcuts()
+
+        setShowsPrivacyOverlay(false)
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
-        sceneWillResignActive()
+        setShowsPrivacyOverlay(true)
     }
 
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // no-op
-    }
+    func sceneWillEnterForeground(_ scene: UIScene) {}
 
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        sceneDidEnterBackground()
-    }
+    func sceneDidEnterBackground(_ scene: UIScene) {}
 }
 
 // MARK: - SettingsButtonInteractionDelegate
